@@ -1,7 +1,5 @@
 # SmartBank - Guia de Estudio para Desarrollo Web
 
-> **Para quien es este proyecto:** Si tienes 17 anos y quieres aprender desarrollo web profesional, este proyecto es tu academia. No es solo codigo, es un banco digital real que cubre todo lo que necesitas saber para convertirte en desarrollador.
-
 ---
 
 ## Que es SmartBank?
