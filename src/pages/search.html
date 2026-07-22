@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Búsqueda - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /*
+      Search Results Page:
+      WHY dedicated search page?
+      - Complex queries need more space than a dropdown
+      - Grouped results help users find what they need
+      - Click-to-navigate pattern connects search to details
+    */
+    .search-hero {
+      text-align:center;padding:var(--spacing-8) 0;margin-bottom:var(--spacing-6);
+    }
+
+    .search-hero h1 { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800);margin-bottom:var(--spacing-4); }
+
+    .search-bar {
+      max-width:640px;margin:0 auto;position:relative;
+    }
+
+    .search-bar input {
+      width:100%;height:52px;padding:0 var(--spacing-12) 0 var(--spacing-12);
+      border:2px solid var(--color-gray-200);border-radius:var(--radius-xl);
+      font-size:var(--font-size-lg);background:var(--color-gray-0);
+      transition:border-color var(--transition-fast),box-shadow var(--transition-fast);
+    }
+
+    .search-bar input:focus { outline:none;border-color:var(--color-primary-500);box-shadow:0 0 0 4px var(--color-primary-100); }
+
+    .search-bar svg { position:absolute;left:var(--spacing-4);top:50%;transform:translateY(-50%);color:var(--color-gray-400); }
+
+    .search-bar .clear-btn {
+      position:absolute;right:var(--spacing-4);top:50%;transform:translateY(-50%);
+      padding:var(--spacing-1);border-radius:var(--radius-sm);color:var(--color-gray-400);
+      cursor:pointer;background:none;border:none;
+    }
+
+    .search-bar .clear-btn:hover { color:var(--color-gray-600); }
+
+    /* Results */
+    .results-info {
+      font-size:var(--font-size-sm);color:var(--color-gray-500);margin-bottom:var(--spacing-6);
+    }
+
+    .results-section {
+      margin-bottom:var(--spacing-8);
+    }
+
+    .results-section-header {
+      display:flex;align-items:center;gap:var(--spacing-2);
+      margin-bottom:var(--spacing-3);
+    }
+
+    .results-section-icon { width:24px;height:24px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:12px; }
+    .results-section-title { font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:var(--color-gray-700);text-transform:uppercase;letter-spacing:0.05em; }
+    .results-count { font-size:var(--font-size-xs);color:var(--color-gray-400);background:var(--color-gray-100);padding:2px 8px;border-radius:var(--radius-full); }
+
+    .result-list { display:flex;flex-direction:column;gap:var(--spacing-2); }
+
+    .result-item {
+      display:flex;align-items:center;gap:var(--spacing-4);
+      padding:var(--spacing-3) var(--spacing-4);
+      background:var(--color-gray-0);border:1px solid var(--color-gray-200);
+      border-radius:var(--radius-lg);cursor:pointer;transition:all var(--transition-fast);
+    }
+    .result-item:hover { border-color:var(--color-primary-300);background:var(--color-primary-50);box-shadow:var(--shadow-sm); }
+
+    .result-icon { width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .result-info { flex:1;min-width:0; }
+    .result-title { font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-800); }
+    .result-subtitle { font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:2px; }
+    .result-arrow { color:var(--color-gray-300);flex-shrink:0; }
+
+    .no-results { text-align:center;padding:var(--spacing-12);color:var(--color-gray-400); }
+    .no-results svg { margin:0 auto var(--spacing-4);opacity:0.3; }
+
+    .quick-links { display:flex;gap:var(--spacing-3);justify-content:center;margin-top:var(--spacing-4);flex-wrap:wrap; }
+    .quick-link { padding:var(--spacing-2) var(--spacing-4);border:1px solid var(--color-gray-200);border-radius:var(--radius-full);font-size:var(--font-size-sm);color:var(--color-gray-600);background:var(--color-gray-0);cursor:pointer;transition:all var(--transition-fast); }
+    .quick-link:hover { border-color:var(--color-primary-300);color:var(--color-primary-600);background:var(--color-primary-50); }
+
+    .highlight { background:var(--color-warning-100);padding:0 2px;border-radius:2px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Búsqueda</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="search-hero">
+        <h1>¿Qué estás buscando?</h1>
+        <div class="search-bar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" placeholder="Buscar cuentas, transacciones, beneficiarios..." autofocus oninput="performSearch()" aria-label="Buscar">
+          <button class="clear-btn" onclick="clearSearch()" aria-label="Limpiar búsqueda">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick links when no search -->
+      <div id="quickLinks">
+        <div class="quick-links">
+          <span class="quick-link" onclick="searchFor('CFE')">⚡ CFE</span>
+          <span class="quick-link" onclick="searchFor('transferencia')">💸 Transferencias</span>
+          <span class="quick-link" onclick="searchFor('María')">👤 María López</span>
+          <span class="quick-link" onclick="searchFor('Netflix')">📺 Netflix</span>
+          <span class="quick-link" onclick="searchFor('depósito')">💰 Depósitos</span>
+        </div>
+      </div>
+
+      <!-- Results container -->
+      <div id="resultsContainer" style="display:none;"></div>
+    </main>
+  </div>
+
+  <script>
+    // Mock search data - in production, this comes from an API
+    const searchData = {
+      accounts: [
+        { name: 'Cuenta Corriente Principal', detail: '•••• 4523 - $45,280.50', link: 'accounts.html', icon: '🏦' },
+        { name: 'Cuenta de Ahorro', detail: '•••• 7891 - $128,450.00', link: 'accounts.html', icon: '🐷' },
+      ],
+      cards: [
+        { name: 'Visa Platinum •••• 4523', detail: 'Límite: $50,000 | Saldo: $12,350.75', link: 'cards.html', icon: '💳' },
+        { name: 'Mastercard Gold •••• 3456', detail: 'Límite: $30,000 | Saldo: $8,200.00', link: 'cards.html', icon: '💳' },
+      ],
+      transactions: [
+        { name: 'Uber Eats', detail: 'Hoy -$245.00', link: 'transactions.html', icon: '🍔' },
+        { name: 'Depósito nómina', detail: 'Ayer +$15,000.00', link: 'transactions.html', icon: '💰' },
+        { name: 'Transferencia a María López', detail: '20 Jun -$2,500.00', link: 'transactions.html', icon: '🔄' },
+        { name: 'CFE - Electricidad', detail: '19 Jun -$850.00', link: 'transactions.html', icon: '⚡' },
+        { name: 'Walmart', detail: '18 Jun -$1,230.00', link: 'transactions.html', icon: '🛒' },
+        { name: 'Netflix', detail: '16 Jun -$299.00', link: 'transactions.html', icon: '📺' },
+      ],
+      beneficiaries: [
+        { name: 'María López', detail: '•••• 5678 - SmartBank', link: 'beneficiaries.html', icon: '👤' },
+        { name: 'Carlos Ruiz', detail: '•••• 9012 - BBVA', link: 'beneficiaries.html', icon: '👤' },
+        { name: 'Ana García', detail: '•••• 3456 - Banorte', link: 'beneficiaries.html', icon: '👤' },
+      ],
+    };
+
+    const sectionLabels = {
+      accounts: 'Cuentas',
+      cards: 'Tarjetas',
+      transactions: 'Transacciones',
+      beneficiaries: 'Beneficiarios',
+    };
+
+    const sectionColors = {
+      accounts: 'background:var(--color-primary-50);color:var(--color-primary-600);',
+      cards: 'background:#f3e8ff;color:#7c3aed;',
+      transactions: 'background:var(--color-success-50);color:var(--color-success-600);',
+      beneficiaries: 'background:var(--color-info-50);color:var(--color-info-600);',
+    };
+
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const quickLinks = document.getElementById('quickLinks');
+      const results = document.getElementById('resultsContainer');
+
+      if (!query) {
+        quickLinks.style.display = '';
+        results.style.display = 'none';
+        return;
+      }
+
+      quickLinks.style.display = 'none';
+      results.style.display = '';
+
+      let html = '';
+      let totalResults = 0;
+
+      Object.entries(searchData).forEach(([category, items]) => {
+        const matches = items.filter(item =>
+          item.name.toLowerCase().includes(query) ||
+          item.detail.toLowerCase().includes(query)
+        );
+
+        if (matches.length > 0) {
+          totalResults += matches.length;
+          html += `
+            <div class="results-section">
+              <div class="results-section-header">
+                <span class="results-section-title">${sectionLabels[category]}</span>
+                <span class="results-count">${matches.length}</span>
+              </div>
+              <div class="result-list">
+                ${matches.map(item => `
+                  <a href="${item.link}" class="result-item">
+                    <div class="result-icon" style="${sectionColors[category]}">${item.icon}</div>
+                    <div class="result-info">
+                      <div class="result-title">${highlightMatch(item.name, query)}</div>
+                      <div class="result-subtitle">${highlightMatch(item.detail, query)}</div>
+                    </div>
+                    <div class="result-arrow">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      if (totalResults === 0) {
+        html = `
+          <div class="no-results">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p>No se encontraron resultados para "<strong>${query}</strong>"</p>
+          </div>
+        `;
+      } else {
+        html = `<div class="results-info">${totalResults} resultado${totalResults > 1 ? 's' : ''} encontrado${totalResults > 1 ? 's' : ''}</div>` + html;
+      }
+
+      results.innerHTML = html;
+    }
+
+    function highlightMatch(text, query) {
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function searchFor(term) {
+      document.getElementById('searchInput').value = term;
+      performSearch();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      performSearch();
+      document.getElementById('searchInput').focus();
+    }
+
+    // Keyboard shortcut: Ctrl+K or / to focus search
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')) {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+      if (e.key === 'Escape') document.getElementById('searchInput').blur();
+    });
+  </script>
+</body>
+</html>

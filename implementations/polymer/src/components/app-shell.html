@@ -1,0 +1,162 @@
+<!--
+  App Shell - Polymer Application Shell
+  
+  POLYMER APP ROUTING:
+  - app-location: URL management
+  - app-route: Route matching
+  - iron-pages: Page switching
+  - Lazy loading via HTML imports
+  
+  WHY app-shell pattern?
+  - Single Page Application structure
+  - Initial load: shell + first page
+  - Subsequent pages: lazy loaded
+  - Better performance than loading everything at once
+  
+  POLYMER vs LIT routing:
+  - Polymer: app-location + app-route (complex, HTML imports)
+  - Lit: @lit-labs/router or Vaadin Router (simple, ES modules)
+  - Recommendation: Use Lit's router for new projects
+-->
+<dom-module id="app-shell">
+  <template>
+    <style>
+      :host {
+        display: block;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      .nav {
+        background: #1a73e8;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .nav-brand {
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: white;
+      }
+
+      .page-container {
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+    </style>
+
+    <!--
+      WHY <app-location>?
+      - Two-way binds URL to route property
+      - Handles browser history (pushState, popstate)
+      - Provides query params and path segments
+    -->
+    <app-location
+      route="{{route}}"
+      use-hash-as-path
+    ></app-location>
+
+    <!--
+      WHY <app-route>?
+      - Matches URL patterns
+      - Extracts route parameters
+      - Nested routes for complex apps
+    -->
+    <app-route
+      route="[[route]]"
+      pattern="/:page"
+      data="{{pageData}}"
+      active="{{routeMatched}}"
+    ></app-route>
+
+    <!-- Navigation -->
+    <nav class="nav">
+      <span class="nav-brand">SmartBank</span>
+      <a
+        class$="nav-link [[_activeClass('dashboard', pageData.page)]]"
+        href="#/dashboard"
+      >Dashboard</a>
+      <a
+        class$="nav-link [[_activeClass('accounts', pageData.page)]]"
+        href="#/accounts"
+      >Accounts</a>
+      <a
+        class$="nav-link [[_activeClass('transactions', pageData.page)]]"
+        href="#/transactions"
+      >Transactions</a>
+      <a
+        class$="nav-link [[_activeClass('transfer', pageData.page)]]"
+        href="#/transfer"
+      >Transfer</a>
+    </nav>
+
+    <!--
+      WHY <iron-pages>?
+      - Switches between child elements based on selected property
+      - Lazy loads pages (if using HTML imports)
+      - Handles page transitions
+      - Similar to Vue's <router-view>
+    -->
+    <div class="page-container">
+      <iron-pages
+        selected="[[pageData.page]]"
+        attr-for-selected="name"
+      >
+        <smart-bank-dashboard name="dashboard"></smart-bank-dashboard>
+        <smart-bank-accounts name="accounts"></smart-bank-accounts>
+        <smart-bank-transactions name="transactions"></smart-bank-transactions>
+        <smart-bank-transfer name="transfer"></smart-bank-transfer>
+      </iron-pages>
+    </div>
+  </template>
+
+  <script>
+    /**
+     * App Shell - Main application container
+     * 
+     * POLYMER app lifecycle:
+     * - ready(): Element is initialized, DOM is ready
+     * - connectedCallback(): Element is in the document
+     * - attached(): Legacy lifecycle (removed in Polymer 3)
+     */
+    class AppShell extends Polymer.Element {
+      static get is() { return 'app-shell'; }
+
+      static get properties() {
+        return {
+          route: { type: Object },
+          pageData: { type: Object },
+        };
+      }
+
+      ready() {
+        super.ready();
+        // Default page
+        if (!this.pageData || !this.pageData.page) {
+          this.pageData = { page: 'dashboard' };
+        }
+      }
+
+      _activeClass(expectedPage, currentPage) {
+        return expectedPage === currentPage ? 'nav-link active' : 'nav-link';
+      }
+    }
+
+    window.customElements.define(AppShell.is, AppShell);
+  </script>
+</dom-module>

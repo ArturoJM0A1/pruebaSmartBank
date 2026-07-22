@@ -1,0 +1,62 @@
+{
+  "name": "smartbank",
+  "version": "1.0.0",
+  "description": "SmartBank - Aplicación web educativa de banca digital. Proyecto completo para aprender desarrollo web profesional.",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "concurrently \"node api/server.js\" \"live-server src --port=3001\"",
+    "dev:api": "node api/server.js",
+    "dev:vanilla": "live-server src --port=3001 --open=/pages/login.html",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:unit": "jest --testPathPattern=tests/unit",
+    "test:integration": "jest --testPathPattern=tests/integration",
+    "lint": "eslint src/ api/ --ext .js,.html,.css",
+    "lint:fix": "eslint src/ api/ --ext .js,.html,.css --fix",
+    "format": "prettier --write \"src/**/*.{js,html,css,json}\" \"api/**/*.js\"",
+    "sonar": "sonar-scanner",
+    "build": "echo 'Build completed - static site ready'",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "banking",
+    "web-app",
+    "educational",
+    "vanilla-js",
+    "react",
+    "vue",
+    "angular",
+    "web-components"
+  ],
+  "author": "SmartBank Educational Project",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@jest/globals": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "concurrently": "^8.2.0",
+    "live-server": "^1.2.2",
+    "supertest": "^6.3.3"
+  },
+  "lint-staged": {
+    "src/**/*.{js,html,css}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "api/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

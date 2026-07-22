@@ -1,0 +1,266 @@
+/* ==========================================================================
+   SmartBank Design Tokens & CSS Custom Properties
+   
+   WHY design tokens?
+   - Centralized theme management: change a value once, propagate everywhere
+   - Enables theming (dark/light mode) by reassigning variables
+   - Makes design consistent across the entire application
+   - CSS custom properties cascade, allowing component-level overrides
+   - Supported in all modern browsers, with fallback support via var()
+   
+   WHY CSS variables over SCSS/Less variables?
+   - CSS variables are live in the browser (can be changed with JS)
+   - No build step required
+   - Scoped to selectors, enabling per-component theming
+   - Work with prefers-color-scheme for automatic dark mode
+   ========================================================================== */
+
+:root {
+  /* ========================================================================
+     COLOR PALETTE
+     
+     Banking apps require trust and professionalism. Blue conveys:
+     - Trust, stability, security (why most banks use blue)
+     - Professionalism without being cold
+     - Calm and reliability
+   
+     We use a primary blue as the brand color, with semantic colors
+     for states (success, warning, danger) that work across cultures.
+     ======================================================================== */
+
+  /* Primary - Brand Blue (Professional banking blue) */
+  --color-primary-50: #eff6ff;    /* Lightest tint - backgrounds */
+  --color-primary-100: #dbeafe;   /* Light tint - hover backgrounds */
+  --color-primary-200: #bfdbfe;   /* Borders, subtle highlights */
+  --color-primary-300: #93c5fd;   /* Disabled states */
+  --color-primary-400: #60a5fa;   /* Icons, secondary elements */
+  --color-primary-500: #3b82f6;   /* Base primary - buttons, links */
+  --color-primary-600: #2563eb;   /* Hover state - darker for depth */
+  --color-primary-700: #1d4ed8;   /* Active/pressed state */
+  --color-primary-800: #1e40af;   /* Dark accents */
+  --color-primary-900: #1e3a5f;   /* Darkest primary */
+
+  /* Secondary - Complementary teal for accent elements */
+  --color-secondary-50: #f0fdfa;
+  --color-secondary-100: #ccfbf1;
+  --color-secondary-200: #99f6e4;
+  --color-secondary-300: #5eead4;
+  --color-secondary-400: #2dd4bf;
+  --color-secondary-500: #14b8a6;
+  --color-secondary-600: #0d9488;
+  --color-secondary-700: #0f766e;
+  --color-secondary-800: #115e59;
+  --color-secondary-900: #134e4a;
+
+  /* Semantic Status Colors */
+  /* Success - green for positive actions (payments sent, confirmations) */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+
+  /* Warning - amber for caution (low balance, pending) */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  /* Danger - red for critical actions (deletions, errors, declined) */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  /* Info - for informational messages and highlights */
+  --color-info-50: #f0f9ff;
+  --color-info-100: #e0f2fe;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+
+  /* ========================================================================
+     NEUTRAL COLORS (Grays)
+     
+     Warm grays (slight brown undertone) feel more premium and banking-appropriate
+     than pure grays. They pair well with blue and feel more "human."
+     ======================================================================== */
+  --color-gray-0: #ffffff;        /* Pure white - cards, modals */
+  --color-gray-50: #f8fafc;       /* Page background */
+  --color-gray-100: #f1f5f9;      /* Sidebar background, input bg */
+  --color-gray-200: #e2e8f0;      /* Borders, dividers */
+  --color-gray-300: #cbd5e1;      /* Disabled borders */
+  --color-gray-400: #94a3b8;      /* Placeholder text, icons */
+  --color-gray-500: #64748b;      /* Secondary text */
+  --color-gray-600: #475569;      /* Body text */
+  --color-gray-700: #334155;      /* Headings */
+  --color-gray-800: #1e293b;      /* Dark text */
+  --color-gray-900: #0f172a;      /* Darkest text */
+
+  /* ========================================================================
+     TYPOGRAPHY
+     
+     Type scale follows a modular scale (1.250 ratio - Major Third).
+     This creates harmonious size relationships between heading levels.
+     
+     Font stack: Inter for modern feel, with system font fallback
+     for fast initial render before web font loads.
+     ======================================================================== */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Type scale - based on 1.250 modular scale from 16px base */
+  --font-size-xs: 0.75rem;      /* 12px - captions, labels */
+  --font-size-sm: 0.875rem;     /* 14px - secondary text */
+  --font-size-base: 1rem;       /* 16px - body text (browser default) */
+  --font-size-lg: 1.125rem;     /* 18px - large body */
+  --font-size-xl: 1.25rem;      /* 20px - h6 */
+  --font-size-2xl: 1.5rem;      /* 24px - h5 */
+  --font-size-3xl: 1.875rem;    /* 30px - h4 */
+  --font-size-4xl: 2.25rem;     /* 36px - h3 */
+  --font-size-5xl: 3rem;        /* 48px - h2 */
+  --font-size-6xl: 3.75rem;     /* 60px - h1 */
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights - tighter for headings, looser for body */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* ========================================================================
+     SPACING SCALE
+     
+     Based on 4px increments. Consistent spacing creates visual rhythm
+     and makes layouts feel intentional and professional.
+     
+     WHY 4px base? It divides evenly into most screen sizes and
+     aligns with design tools (Figma, Sketch use 4px grids).
+     ======================================================================== */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;    /* 4px */
+  --spacing-2: 0.5rem;     /* 8px */
+  --spacing-3: 0.75rem;    /* 12px */
+  --spacing-4: 1rem;       /* 16px */
+  --spacing-5: 1.25rem;    /* 20px */
+  --spacing-6: 1.5rem;     /* 24px */
+  --spacing-8: 2rem;       /* 32px */
+  --spacing-10: 2.5rem;    /* 40px */
+  --spacing-12: 3rem;      /* 48px */
+  --spacing-16: 4rem;      /* 64px */
+  --spacing-20: 5rem;      /* 80px */
+  --spacing-24: 6rem;      /* 96px */
+
+  /* ========================================================================
+     BORDER RADIUS
+     
+     Rounded corners make UI feel friendly and modern.
+     Banking apps use subtle rounding - not too playful, not too sharp.
+     ======================================================================== */
+  --radius-none: 0;
+  --radius-sm: 0.25rem;     /* 4px - small elements (badges) */
+  --radius-md: 0.5rem;      /* 8px - buttons, inputs */
+  --radius-lg: 0.75rem;     /* 12px - cards */
+  --radius-xl: 1rem;        /* 16px - modals, large cards */
+  --radius-2xl: 1.5rem;     /* 24px - feature cards */
+  --radius-full: 9999px;    /* Pill shape - avatars, toggles */
+
+  /* ========================================================================
+     SHADOWS
+     
+     Shadows create depth hierarchy. In banking apps, subtle shadows
+     convey professionalism without being flashy.
+     
+     We use multiple shadow layers for realistic depth:
+     - First layer: soft ambient shadow
+     - Second layer: sharper drop shadow
+     ======================================================================== */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  /* ========================================================================
+     BREAKPOINTS
+     
+     Mobile-first design means we write base styles for mobile,
+     then progressively enhance for larger screens.
+     
+     Breakpoint values based on common device widths:
+     - sm: 640px - Large phones landscape
+     - md: 768px - Tablets portrait
+     - lg: 1024px - Tablets landscape, small laptops
+     - xl: 1280px - Desktops
+     - 2xl: 1536px - Large screens
+     ======================================================================== */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ========================================================================
+     Z-INDEX SCALE
+     
+     Z-index management prevents stacking conflicts.
+     Using a scale ensures consistent layering across the app.
+     
+     Rule: Don't use arbitrary z-index values. Use this scale.
+     ======================================================================== */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+
+  /* ========================================================================
+     TRANSITIONS
+     
+     Consistent timing creates a cohesive feel.
+     - fast: micro-interactions (hover, focus)
+     - normal: component state changes (expand, collapse)
+     - slow: page transitions, modals
+     ======================================================================== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ========================================================================
+     LAYOUT
+     
+     Sidebar width and header height for the application shell.
+     These define the fixed layout dimensions.
+     ======================================================================== */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+  --header-height: 64px;
+
+  /* ========================================================================
+     COMPONENT TOKENS
+     
+     These combine primitive tokens into component-level values.
+     Example: --btn-primary-bg uses --color-primary-600.
+     ======================================================================== */
+  --btn-height-sm: 32px;
+  --btn-height-md: 40px;
+  --btn-height-lg: 48px;
+
+  --input-height-sm: 32px;
+  --input-height-md: 40px;
+  --input-height-lg: 48px;
+}

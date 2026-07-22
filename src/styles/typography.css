@@ -1,0 +1,297 @@
+/* ==========================================================================
+   SmartBank Typography System
+   
+   WHY a typography system?
+   Consistent typography creates visual hierarchy and readability.
+   A type scale provides pre-defined sizes that work together harmoniously.
+   
+   Type Scale: Based on 1.250 (Major Third) modular scale
+   This means each heading level is 1.25x the size of the one below.
+   The result feels natural and mathematically harmonious.
+   
+   Readability guidelines:
+   - Body text: 16px minimum (WCAG recommendation)
+   - Line height: 1.5 for body, tighter for headings
+   - Max line length: 65-75 characters for optimal reading
+   - Sufficient contrast ratios for accessibility (4.5:1 minimum)
+   ========================================================================== */
+
+/* ========================================================================
+   HEADINGS
+   
+   Headings establish content hierarchy. They guide the reader's eye
+   through the page, from most important (h1) to least (h6).
+   
+   h1: Page title - one per page, largest
+   h2: Section headings - major content divisions
+   h3: Subsection headings - within sections
+   h4-h6: Minor headings - rarely used in modern web apps
+   ======================================================================== */
+h1 {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.025em;
+  color: var(--color-gray-900);
+}
+
+h2 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+  color: var(--color-gray-900);
+}
+
+h3 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  letter-spacing: -0.015em;
+  color: var(--color-gray-800);
+}
+
+h4 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  letter-spacing: -0.01em;
+  color: var(--color-gray-800);
+}
+
+h5 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  color: var(--color-gray-700);
+}
+
+h6 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  color: var(--color-gray-700);
+}
+
+/* ========================================================================
+   BODY TEXT
+   
+   The primary reading font. Optimized for screen readability.
+   - 16px base size for comfortable reading
+   - 1.5 line height provides breathing room between lines
+   - Semi-bold weight for strong emphasis without being too heavy
+   ======================================================================== */
+p {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-600);
+  margin-bottom: var(--spacing-4);
+}
+
+.text-body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.text-lead {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-gray-500);
+}
+
+/* ========================================================================
+   SMALL TEXT
+   
+   Used for captions, labels, footnotes, and secondary information.
+   Small text should remain readable - never go below 12px.
+   ======================================================================== */
+small,
+.text-sm {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.text-xs {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+}
+
+/* ========================================================================
+   TEXT WEIGHT UTILITIES
+   
+   Semantic weights for different contexts:
+   - light: decorative, large display text
+   - normal: body text default
+   - medium: labels, emphasis
+   - semibold: headings, important info
+   - bold: primary headings, strong emphasis
+   ======================================================================== */
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* ========================================================================
+   LINKS
+   
+   Links need clear visual distinction from body text.
+   The underline provides an affordance for clickability.
+   In banking apps, links to financial details should be clearly identifiable.
+   ======================================================================== */
+a {
+  color: var(--color-primary-600);
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-700);
+}
+
+.link {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.link:hover {
+  color: var(--color-primary-700);
+  text-decoration-thickness: 2px;
+}
+
+.link-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--color-primary-300);
+}
+
+.link-underline:hover {
+  text-decoration-color: var(--color-primary-600);
+}
+
+/* ========================================================================
+   LISTS
+   
+   Lists organize content hierarchically.
+   In banking apps, lists show transactions, settings, features, etc.
+   ======================================================================== */
+.list-disc {
+  list-style-type: disc;
+  padding-left: var(--spacing-5);
+}
+
+.list-decimal {
+  list-style-type: decimal;
+  padding-left: var(--spacing-5);
+}
+
+.list-none {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.list-item {
+  padding: var(--spacing-2) 0;
+  line-height: var(--line-height-normal);
+}
+
+/* ========================================================================
+   CODE TEXT
+   
+   Monospace font for technical content, account numbers, etc.
+   In banking apps, often used for displaying account details.
+   ======================================================================== */
+code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  background-color: var(--color-gray-100);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger-600);
+}
+
+pre {
+  font-family: var(--font-family-mono);
+  background-color: var(--color-gray-100);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: var(--line-height-relaxed);
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* ========================================================================
+   TEXT ALIGNMENT UTILITIES
+   
+   Text alignment affects readability:
+   - Left-aligned: best for body text (most readable)
+   - Centered: for short text, headings, CTAs
+   - Right: for numbers in tables, RTL languages
+   ======================================================================== */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* ========================================================================
+   TEXT COLOR UTILITIES
+   
+   Semantic text colors that map to our design system.
+   Use semantic colors (success, danger) for meaning, not decoration.
+   ======================================================================== */
+.text-primary { color: var(--color-primary-600); }
+.text-secondary { color: var(--color-gray-500); }
+.text-success { color: var(--color-success-600); }
+.text-warning { color: var(--color-warning-600); }
+.text-danger { color: var(--color-danger-600); }
+.text-muted { color: var(--color-gray-400); }
+
+/* ========================================================================
+   TEXT TRANSFORM UTILITIES
+   
+   text-transform: uppercase for labels and small text headers.
+   Use sparingly - uppercase text is harder to read.
+   ======================================================================== */
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+/* ========================================================================
+   TRUNCATION
+   
+   Single-line text truncation with ellipsis.
+   Essential for responsive layouts where text might overflow.
+   ======================================================================== */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

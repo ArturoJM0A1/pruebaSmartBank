@@ -1,0 +1,137 @@
+# ============================================================================
+# SMARTBANK - CD PIPELINE (Continuous Deployment)
+# ============================================================================
+#
+# WHAT IS CD?
+#   Continuous Deployment automatically deploys code to production
+#   after all CI checks pass. It's the "last mile" of the pipeline.
+#
+# CD vs CI:
+#   - CI: "Is the code good?" (lint, test, build)
+#   - CD: "Ship it!" (deploy to servers)
+#
+# DEPLOYMENT STRATEGIES:
+#   - Blue-Green: Two identical environments, swap traffic
+#   - Canary: Gradually roll out to small percentage of users
+#   - Rolling: Update servers one at a time
+#   - Static: Upload files to CDN (what we use for SmartBank)
+#
+# WHY GITHUB PAGES?
+#   - Free hosting for static sites
+#   - Automatic HTTPS
+#   - Custom domain support
+#   - Perfect for educational projects
+#
+# ============================================================================
+
+name: SmartBank CD
+
+# ============================================================================
+# TRIGGERS
+# ============================================================================
+
+on:
+  push:
+    branches: [main] # Only deploy from main
+  workflow_dispatch: # Manual trigger
+
+# ============================================================================
+# JOBS
+# ============================================================================
+
+jobs:
+  # ==========================================================================
+  # JOB 1: Build for Production
+  # ==========================================================================
+
+  build:
+    name: Build for Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+          retention-days: 1
+
+  # ==========================================================================
+  # JOB 2: Deploy to GitHub Pages
+  # ==========================================================================
+  # WHAT: Uploads static files to GitHub Pages
+  # WHY: Free, reliable hosting for static sites
+  # NOTE: Requires GitHub Pages enabled in repository settings
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    # WHY permissions: GitHub Pages requires these tokens
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # WHAT: Links deployment to GitHub Pages environment
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+        # WHAT: Prepares files for Pages deployment
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # WHAT: Actually deploys the site
+
+  # ==========================================================================
+  # JOB 3: Post-Deployment Verification
+  # ==========================================================================
+
+  verify:
+    name: Verify Deployment
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+        # WHY: Give GitHub Pages time to propagate
+
+      - name: Check site is accessible
+        run: |
+          curl -f https://smartbank.github.io/guiaplexus/ || exit 1
+        # WHY: Verify the site actually works after deployment
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "Deployment successful! Site is live."

@@ -1,0 +1,373 @@
+/* ==========================================================================
+   SmartBank Layout System
+   
+   WHY Grid vs Flexbox?
+   CSS Grid: Two-dimensional layouts (rows AND columns simultaneously)
+   Flexbox: One-dimensional layouts (row OR column)
+   
+   Rule of thumb:
+   - Flexbox: Components, small pieces (nav items, button groups)
+   - Grid: Page layout, card grids, dashboards
+   
+   This file provides utility classes for both Grid and Flexbox,
+   plus layout-specific classes for the app shell (sidebar, header, etc.)
+   ========================================================================== */
+
+/* ========================================================================
+   CSS GRID UTILITIES
+   
+   CSS Grid creates a two-dimensional grid system. Think of it as
+   defining rows and columns explicitly. Great for:
+   - Dashboard layouts
+   - Card grids
+   - Complex page layouts
+   - Anywhere you need items to align in both directions
+   ======================================================================== */
+
+/* Basic grid container */
+.grid {
+  display: grid;
+}
+
+/* Column-based grids - items flow into columns */
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+.grid-cols-12 { grid-template-columns: repeat(12, 1fr); }
+
+/* 
+   Auto-fit: Creates as many columns as fit, with minimum width.
+   This is RESPONSIVE without media queries!
+   minmax(250px, 1fr) means each column is at least 250px wide.
+   fr means "fraction of remaining space" - items share space equally.
+*/
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Similar to auto-fit, but minmax is 300px */
+.grid-auto-fill {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* Column and row gaps */
+.gap-1 { gap: var(--spacing-1); }
+.gap-2 { gap: var(--spacing-2); }
+.gap-3 { gap: var(--spacing-3); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-5 { gap: var(--spacing-5); }
+.gap-6 { gap: var(--spacing-6); }
+.gap-8 { gap: var(--spacing-8); }
+
+/* Row gap only */
+.row-gap-4 { row-gap: var(--spacing-4); }
+.row-gap-6 { row-gap: var(--spacing-6); }
+
+/* Column gap only */
+.col-gap-4 { column-gap: var(--spacing-4); }
+.col-gap-6 { column-gap: var(--spacing-6); }
+
+/* ========================================================================
+   FLEXBOX UTILITIES
+   
+   Flexbox is one-dimensional - items flow in a single direction
+   (row or column). It's simpler than Grid and perfect for:
+   - Navigation bars
+   - Button groups
+   - Card content (header + body + footer)
+   - Centering items
+   - Spacing items evenly
+   ======================================================================== */
+
+/* Direction */
+.flex { display: flex; }
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.flex-row-reverse { flex-direction: row-reverse; }
+.flex-col-reverse { flex-direction: column-reverse; }
+
+/* Wrap */
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+/* Main axis alignment (horizontal in row, vertical in column) */
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.justify-evenly { justify-content: space-evenly; }
+
+/* Cross axis alignment (vertical in row, horizontal in column) */
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.items-baseline { align-items: baseline; }
+.items-stretch { align-items: stretch; }
+
+/* Individual item alignment */
+.self-start { align-self: flex-start; }
+.self-end { align-self: flex-end; }
+.self-center { align-self: center; }
+.self-stretch { align-self: stretch; }
+
+/* Flex grow and shrink */
+.flex-1 { flex: 1 1 0%; }       /* Grows and shrinks equally */
+.flex-auto { flex: 1 1 auto; }  /* Grows/shrinks based on content */
+.flex-none { flex: none; }      /* Fixed size, no grow/shrink */
+.flex-shrink-0 { flex-shrink: 0; } /* Don't shrink */
+.flex-grow-1 { flex-grow: 1; }
+
+/* ========================================================================
+   CONTAINER CLASSES
+   
+   Containers constrain content width for readability.
+   Optimal reading width is 65-75 characters (~600-700px for body text).
+   Containers use auto margins for centering.
+   ======================================================================== */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+.container-sm {
+  width: 100%;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+.container-lg {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+/* Full-width container (no max-width) */
+.container-full {
+  width: 100%;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+/* ========================================================================
+   SPACING UTILITIES (Margin & Padding)
+   
+   Based on our 4px spacing scale. Shorthand naming:
+   - m: margin, p: padding
+   - t/b/l/r: top/bottom/left/right
+   - x: horizontal (left + right), y: vertical (top + bottom)
+   - 0-24: spacing value (0 = 0, 1 = 4px, 2 = 8px, etc.)
+   
+   WHY utility classes for spacing?
+   They eliminate the need for custom CSS for simple spacing adjustments.
+   Trade-off: more HTML classes, but less CSS files to maintain.
+   ========================================================================== */
+
+/* Margin utilities */
+.m-0 { margin: var(--spacing-0); }
+.m-1 { margin: var(--spacing-1); }
+.m-2 { margin: var(--spacing-2); }
+.m-3 { margin: var(--spacing-3); }
+.m-4 { margin: var(--spacing-4); }
+.m-6 { margin: var(--spacing-6); }
+.m-8 { margin: var(--spacing-8); }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Margin top/bottom */
+.mt-0 { margin-top: var(--spacing-0); }
+.mt-1 { margin-top: var(--spacing-1); }
+.mt-2 { margin-top: var(--spacing-2); }
+.mt-3 { margin-top: var(--spacing-3); }
+.mt-4 { margin-top: var(--spacing-4); }
+.mt-6 { margin-top: var(--spacing-6); }
+.mt-8 { margin-top: var(--spacing-8); }
+.mb-0 { margin-bottom: var(--spacing-0); }
+.mb-1 { margin-bottom: var(--spacing-1); }
+.mb-2 { margin-bottom: var(--spacing-2); }
+.mb-3 { margin-bottom: var(--spacing-3); }
+.mb-4 { margin-bottom: var(--spacing-4); }
+.mb-6 { margin-bottom: var(--spacing-6); }
+.mb-8 { margin-bottom: var(--spacing-8); }
+
+/* Margin horizontal */
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+
+/* Padding utilities */
+.p-0 { padding: var(--spacing-0); }
+.p-1 { padding: var(--spacing-1); }
+.p-2 { padding: var(--spacing-2); }
+.p-3 { padding: var(--spacing-3); }
+.p-4 { padding: var(--spacing-4); }
+.p-5 { padding: var(--spacing-5); }
+.p-6 { padding: var(--spacing-6); }
+.p-8 { padding: var(--spacing-8); }
+
+/* Padding top/bottom */
+.pt-2 { padding-top: var(--spacing-2); }
+.pt-4 { padding-top: var(--spacing-4); }
+.pt-6 { padding-top: var(--spacing-6); }
+.pb-2 { padding-bottom: var(--spacing-2); }
+.pb-4 { padding-bottom: var(--spacing-4); }
+.pb-6 { padding-bottom: var(--spacing-6); }
+
+/* Padding horizontal (x-axis) */
+.px-4 { padding-left: var(--spacing-4); padding-right: var(--spacing-4); }
+.px-6 { padding-left: var(--spacing-6); padding-right: var(--spacing-6); }
+.px-8 { padding-left: var(--spacing-8); padding-right: var(--spacing-8); }
+
+/* Padding vertical (y-axis) */
+.py-4 { padding-top: var(--spacing-4); padding-bottom: var(--spacing-4); }
+.py-6 { padding-top: var(--spacing-6); padding-bottom: var(--spacing-6); }
+
+/* ========================================================================
+   DISPLAY UTILITIES
+   
+   Control how elements are displayed. Key values:
+   - block: full width, breaks to new line
+   - inline: flows with text
+   - inline-block: inline but with block properties (width/height)
+   - none: removes from layout
+   - flex/grid: layout containers
+   ======================================================================== */
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.hidden { display: none; }
+
+/* ========================================================================
+   APP SHELL LAYOUT
+   
+   The main application layout structure for logged-in users.
+   Uses CSS Grid for the overall page structure.
+   
+   Layout structure:
+   ┌──────────┬────────────────────────┐
+   │  Sidebar │  Header               │
+   │          ├────────────────────────┤
+   │          │  Main Content          │
+   │          │                        │
+   │          │                        │
+   └──────────┴────────────────────────┘
+   ======================================================================== */
+.app-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+}
+
+.app-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-6);
+  background-color: var(--color-gray-0);
+  border-bottom: 1px solid var(--color-gray-200);
+  z-index: var(--z-sticky);
+  position: sticky;
+  top: 0;
+}
+
+.app-sidebar {
+  grid-area: sidebar;
+  background-color: var(--color-gray-900);
+  color: var(--color-gray-0);
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: var(--z-fixed);
+}
+
+.app-main {
+  grid-area: main;
+  padding: var(--spacing-6);
+  overflow-y: auto;
+  min-height: calc(100vh - var(--header-height));
+}
+
+.app-footer {
+  grid-column: 1 / -1;
+  padding: var(--spacing-4);
+  text-align: center;
+  background-color: var(--color-gray-0);
+  border-top: 1px solid var(--color-gray-200);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+/* ========================================================================
+   SECTION LAYOUT
+   
+   Content sections within the main area.
+   Provides consistent spacing between sections.
+   ======================================================================== */
+.section {
+  margin-bottom: var(--spacing-8);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-6);
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+}
+
+/* ========================================================================
+   CARD LAYOUT
+   
+   Cards are the primary content containers in banking dashboards.
+   They group related information and actions.
+   ======================================================================== */
+.card {
+  background-color: var(--color-gray-0);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-bottom: 1px solid var(--color-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-body {
+  padding: var(--spacing-6);
+}
+
+.card-footer {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-gray-100);
+  background-color: var(--color-gray-50);
+}

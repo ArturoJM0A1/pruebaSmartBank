@@ -1,0 +1,1066 @@
+/* ==========================================================================
+   SmartBank Component Styles
+   
+   WHY BEM naming convention?
+   BEM (Block__Element--Modifier) provides a systematic approach to naming
+   CSS classes. Benefits:
+   - Clear relationship between classes (btn, btn__icon, btn--primary)
+   - No naming conflicts between components
+   - Self-documenting: class names describe what they style
+   - Easy to find in codebase (grep for .btn-)
+   
+   Component CSS vs Utility CSS:
+   We use BOTH approaches (hybrid):
+   - Component CSS: for complex components (buttons, cards, modals)
+   - Utility CSS: for layout and spacing adjustments
+   
+   This gives us the best of both worlds:
+   - Reusable component styles
+   - Fine-grained control without writing custom CSS
+   ========================================================================== */
+
+/* ========================================================================
+   BUTTONS
+   
+   Buttons are the primary interactive elements. They need:
+   - Clear visual hierarchy (primary, secondary, ghost)
+   - Multiple sizes for different contexts
+   - Disabled and loading states
+   - Accessible focus states
+   
+   Button hierarchy:
+   - Primary: Main actions (Submit, Pay, Confirm)
+   - Secondary: Alternative actions (Cancel, Back)
+   - Ghost: Tertiary actions (Close, Skip)
+   - Danger: Destructive actions (Delete, Remove)
+   ======================================================================== */
+
+/* Base button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  font-family: inherit;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+}
+
+/* Remove spinner from buttons - we'll add custom loading states */
+.btn::-webkit-spin-button,
+.btn::-webkit-search-decoration,
+.btn::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+/* Button sizes */
+.btn-sm {
+  height: var(--btn-height-sm);
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+.btn-md {
+  height: var(--btn-height-md);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  height: var(--btn-height-lg);
+  padding: var(--spacing-2) var(--spacing-6);
+  font-size: var(--font-size-base);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Primary button - main brand color */
+.btn-primary {
+  background-color: var(--color-primary-600);
+  color: var(--color-gray-0);
+  border-color: var(--color-primary-600);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-700);
+  border-color: var(--color-primary-700);
+}
+
+.btn-primary:active {
+  background-color: var(--color-primary-800);
+}
+
+/* Secondary button - outlined style */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-300);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-400);
+}
+
+.btn-secondary:active {
+  background-color: var(--color-primary-100);
+}
+
+/* Ghost button - no border */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-gray-600);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-gray-100);
+}
+
+.btn-ghost:active {
+  background-color: var(--color-gray-200);
+}
+
+/* Danger button - for destructive actions */
+.btn-danger {
+  background-color: var(--color-danger-600);
+  color: var(--color-gray-0);
+  border-color: var(--color-danger-600);
+}
+
+.btn-danger:hover {
+  background-color: var(--color-danger-700);
+}
+
+/* Success button */
+.btn-success {
+  background-color: var(--color-success-600);
+  color: var(--color-gray-0);
+  border-color: var(--color-success-600);
+}
+
+.btn-success:hover {
+  background-color: var(--color-success-700);
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading state */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Button with icon */
+.btn-icon {
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+}
+
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================================================
+   FORM ELEMENTS
+   
+   Forms need to be:
+   - Accessible (labels, ARIA attributes, error messages)
+   - Clear (labels, placeholders, help text)
+   - Consistent (same styling across all inputs)
+   - Responsive (stack on mobile, inline on desktop)
+   
+   Form structure:
+   form-group > label + input + help-text/error-message
+   ======================================================================== */
+.form-group {
+  margin-bottom: var(--spacing-5);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+
+.form-label-required::after {
+  content: ' *';
+  color: var(--color-danger-500);
+}
+
+/* Base input styles */
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  height: var(--input-height-md);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-800);
+  background-color: var(--color-gray-0);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--color-gray-400);
+}
+
+/* Focus state - critical for accessibility */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+/* Error state */
+.form-input.error,
+.form-select.error,
+.form-textarea.error {
+  border-color: var(--color-danger-500);
+}
+
+.form-input.error:focus,
+.form-select.error:focus,
+.form-textarea.error:focus {
+  box-shadow: 0 0 0 3px var(--color-danger-100);
+}
+
+/* Success state */
+.form-input.success,
+.form-select.success {
+  border-color: var(--color-success-500);
+}
+
+/* Disabled state */
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background-color: var(--color-gray-100);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Input sizes */
+.form-input-lg {
+  height: var(--input-height-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-lg);
+}
+
+.form-input-sm {
+  height: var(--input-height-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-sm);
+}
+
+/* Textarea */
+.form-textarea {
+  height: auto;
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Select dropdown */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-3) center;
+  padding-right: var(--spacing-10);
+}
+
+/* Help text and error messages */
+.form-help {
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.form-error {
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-danger-600);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+/* Input with icon */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group .form-input {
+  padding-left: var(--spacing-10);
+}
+
+.input-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--color-gray-400);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Input with right action (like password toggle) */
+.input-action-right {
+  position: absolute;
+  right: var(--spacing-3);
+  color: var(--color-gray-400);
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* ========================================================================
+   CHECKBOX & RADIO
+   
+   Custom styled checkboxes and radios.
+   We hide the native inputs and create visual replacements.
+   This allows consistent styling across browsers while
+   maintaining accessibility (the hidden inputs still work).
+   ======================================================================== */
+.form-checkbox,
+.form-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.form-checkbox input,
+.form-radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom checkbox */
+.form-checkbox-mark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  background-color: var(--color-gray-0);
+}
+
+.form-checkbox input:checked + .form-checkbox-mark {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.form-checkbox input:checked + .form-checkbox-mark::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+/* Custom radio */
+.form-radio-mark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  background-color: var(--color-gray-0);
+}
+
+.form-radio input:checked + .form-radio-mark {
+  border-color: var(--color-primary-600);
+}
+
+.form-radio input:checked + .form-radio-mark::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary-600);
+}
+
+/* Focus state for accessibility */
+.form-checkbox input:focus-visible + .form-checkbox-mark,
+.form-radio input:focus-visible + .form-radio-mark {
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+/* ========================================================================
+   BADGES & TAGS
+   
+   Small labels for status, categories, or counts.
+   Used in banking for account status, transaction types, etc.
+   ======================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+.badge-success {
+  background-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+.badge-warning {
+  background-color: var(--color-warning-100);
+  color: var(--color-warning-700);
+}
+
+.badge-danger {
+  background-color: var(--color-danger-100);
+  color: var(--color-danger-700);
+}
+
+.badge-info {
+  background-color: var(--color-info-100);
+  color: var(--color-info-700);
+}
+
+.badge-gray {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+/* Dot indicator (unread, online, etc.) */
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary-500);
+}
+
+.badge-dot-danger {
+  background-color: var(--color-danger-500);
+}
+
+.badge-dot-success {
+  background-color: var(--color-success-500);
+}
+
+/* Count badge (for notifications) */
+.badge-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-danger-500);
+  color: white;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================================================
+   TABLES
+   
+   Tables display structured data. In banking apps, they show:
+   - Transaction lists
+   - Account details
+   - Beneficiary lists
+   - Settings options
+   
+   Design considerations:
+   - Alternating row colors for readability
+   - Sticky header for scrolling tables
+   - Responsive: horizontal scroll on mobile
+   ======================================================================== */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  padding: var(--spacing-3) var(--spacing-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  background-color: var(--color-gray-50);
+  border-bottom: 2px solid var(--color-gray-200);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-gray-50);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Striped rows - alternative to hover */
+.table-striped tbody tr:nth-child(even) {
+  background-color: var(--color-gray-50);
+}
+
+/* ========================================================================
+   MODALS
+   
+   Modals (dialogs) require special attention:
+   - Trap focus within the modal (accessibility)
+   - Close on Escape key
+   - Close on backdrop click
+   - Animate in/out smoothly
+   - Prevent body scroll when open
+   
+   Z-index stacking:
+   backdrop (400) < modal (500) < tooltip (700)
+   ======================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-backdrop);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: var(--z-modal);
+  background-color: var(--color-gray-0);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 500px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.modal.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-5) var(--spacing-6);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--color-gray-400);
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.modal-body {
+  padding: var(--spacing-6);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-gray-100);
+}
+
+/* Modal sizes */
+.modal-sm { max-width: 400px; }
+.modal-lg { max-width: 700px; }
+.modal-xl { max-width: 900px; }
+
+/* ========================================================================
+   TOASTS / ALERTS
+   
+   Toast notifications appear temporarily to inform users.
+   They should:
+   - Auto-dismiss after a few seconds
+   - Be dismissible by the user
+   - Stack if multiple appear
+   - Not block user interaction
+   
+   Position: Bottom-right (conventional, non-intrusive)
+   ======================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: var(--spacing-6);
+  right: var(--spacing-6);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-5);
+  background-color: var(--color-gray-0);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border-left: 4px solid var(--color-gray-400);
+  min-width: 300px;
+  max-width: 450px;
+  pointer-events: all;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: all var(--transition-normal);
+}
+
+.toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-success {
+  border-left-color: var(--color-success-500);
+}
+
+.toast-error {
+  border-left-color: var(--color-danger-500);
+}
+
+.toast-warning {
+  border-left-color: var(--color-warning-500);
+}
+
+.toast-info {
+  border-left-color: var(--color-info-500);
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-1);
+}
+
+.toast-message {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.toast-close {
+  color: var(--color-gray-400);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: var(--color-gray-600);
+}
+
+/* ========================================================================
+   TOOLTIPS
+   
+   Tooltips show additional info on hover.
+   CSS-only tooltips using ::before and ::after pseudo-elements.
+   ======================================================================== */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: var(--spacing-1) var(--spacing-2);
+  background-color: var(--color-gray-800);
+  color: var(--color-gray-0);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+}
+
+.tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+/* ========================================================================
+   DROPDOWNS
+   
+   Dropdown menus appear on click/hover.
+   Position absolutely relative to the trigger element.
+   ======================================================================== */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-1);
+  min-width: 200px;
+  background-color: var(--color-gray-0);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--transition-fast);
+  z-index: var(--z-dropdown);
+  padding: var(--spacing-2);
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-gray-100);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--color-gray-200);
+  margin: var(--spacing-2) 0;
+}
+
+/* ========================================================================
+   PAGINATION
+   
+   Navigate through lists of data.
+   Standard pattern: < 1 2 3 ... 10 >
+   ======================================================================== */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 var(--spacing-2);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-0);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+}
+
+.pagination-btn.active {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: var(--color-gray-0);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+  padding: 0 var(--spacing-2);
+  color: var(--color-gray-400);
+}
+
+/* ========================================================================
+   LOADER / SPINNER
+   
+   Loading indicators for async operations.
+   CSS-only spinner using border animation.
+   ======================================================================== */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.spinner-lg {
+  width: 56px;
+  height: 56px;
+  border-width: 4px;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: var(--z-fixed);
+}
+
+/* ========================================================================
+   TABS
+   
+   Tab navigation for switching between views.
+   Common in banking: Overview | Transactions | Statements
+   ======================================================================== */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-gray-200);
+  gap: var(--spacing-1);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--color-gray-700);
+}
+
+.tab.active {
+  color: var(--color-primary-600);
+  border-bottom-color: var(--color-primary-600);
+}
+
+/* ========================================================================
+   AVATAR
+   
+   User avatar display. Circular by default (profile pictures).
+   Falls back to initials if no image is provided.
+   ======================================================================== */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-600);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--font-size-xs);
+}
+
+.avatar-md {
+  width: 40px;
+  height: 40px;
+  font-size: var(--font-size-sm);
+}
+
+.avatar-lg {
+  width: 56px;
+  height: 56px;
+  font-size: var(--font-size-lg);
+}
+
+.avatar-xl {
+  width: 80px;
+  height: 80px;
+  font-size: var(--font-size-2xl);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========================================================================
+   SKELETON LOADING
+   
+   Placeholder shapes shown while content loads.
+   Creates a perceived performance improvement.
+   Uses the shimmer animation from animations.css.
+   ======================================================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-100) 25%,
+    var(--color-gray-200) 50%,
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+  height: 16px;
+  margin-bottom: var(--spacing-2);
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  margin-bottom: var(--spacing-3);
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-card {
+  height: 200px;
+  border-radius: var(--radius-lg);
+}

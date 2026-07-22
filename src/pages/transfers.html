@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferencias - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /* 
+      Transfer Page - Multi-step Form Pattern:
+      Step 1: Select source account and beneficiary
+      Step 2: Enter amount and details
+      Step 3: Review and confirm
+      Step 4: Success receipt
+      
+      WHY multi-step for transfers?
+      - Reduces errors (review before sending)
+      - Meets regulatory requirements (confirmation step)
+      - Builds confidence (user sees summary before committing)
+    */
+    .transfer-container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-6);
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--spacing-8);
+      position: relative;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      border: 2px solid var(--color-gray-300);
+      color: var(--color-gray-400);
+      background: var(--color-gray-0);
+      transition: all var(--transition-normal);
+    }
+
+    .step-item.active .step-circle {
+      border-color: var(--color-primary-600);
+      background: var(--color-primary-600);
+      color: white;
+    }
+
+    .step-item.completed .step-circle {
+      border-color: var(--color-success-500);
+      background: var(--color-success-500);
+      color: white;
+    }
+
+    .step-line {
+      width: 60px;
+      height: 2px;
+      background: var(--color-gray-200);
+      align-self: center;
+      margin: 0 var(--spacing-2);
+      transition: background var(--transition-normal);
+    }
+
+    .step-line.completed { background: var(--color-success-500); }
+
+    /* Form card */
+    .form-card {
+      background: var(--color-gray-0);
+      border: 1px solid var(--color-gray-200);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-6);
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; animation: fadeInUp 0.3s ease-out; }
+
+    .form-section-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-1);
+    }
+
+    .form-section-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-500);
+      margin-bottom: var(--spacing-6);
+    }
+
+    .form-field {
+      margin-bottom: var(--spacing-5);
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-700);
+    }
+
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      padding: var(--spacing-3);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px var(--color-primary-100);
+    }
+
+    .form-field .field-error {
+      font-size: var(--font-size-sm);
+      color: var(--color-danger-600);
+      margin-top: var(--spacing-1);
+      display: none;
+    }
+
+    .form-field.error input { border-color: var(--color-danger-500); }
+    .form-field.error .field-error { display: block; }
+
+    .form-help-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-gray-500);
+      margin-top: var(--spacing-1);
+    }
+
+    /* Account selector cards */
+    .account-option {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      padding: var(--spacing-4);
+      border: 2px solid var(--color-gray-200);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-bottom: var(--spacing-3);
+    }
+
+    .account-option:hover { border-color: var(--color-primary-300); }
+    .account-option.selected { border-color: var(--color-primary-500); background: var(--color-primary-50); }
+
+    .account-option-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--color-primary-50);
+      color: var(--color-primary-600);
+      flex-shrink: 0;
+    }
+
+    .account-option-info { flex: 1; }
+    .account-option-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-gray-800); }
+    .account-option-detail { font-size: var(--font-size-xs); color: var(--color-gray-500); }
+    .account-option-balance { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-gray-800); }
+
+    /* Beneficiary selector */
+    .beneficiary-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--spacing-3);
+    }
+
+    .beneficiary-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-2);
+      padding: var(--spacing-4);
+      border: 2px solid var(--color-gray-200);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+
+    .beneficiary-option:hover { border-color: var(--color-primary-300); }
+    .beneficiary-option.selected { border-color: var(--color-primary-500); background: var(--color-primary-50); }
+
+    .beneficiary-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--color-primary-100); color: var(--color-primary-600);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: var(--font-weight-semibold); font-size: var(--font-size-base);
+    }
+
+    .beneficiary-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-gray-800); }
+    .beneficiary-account { font-size: var(--font-size-xs); color: var(--color-gray-400); font-family: var(--font-family-mono); }
+
+    /* Confirmation summary */
+    .confirm-summary {
+      background: var(--color-gray-50);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-6);
+    }
+
+    .confirm-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacing-2) 0;
+      font-size: var(--font-size-sm);
+    }
+
+    .confirm-label { color: var(--color-gray-500); }
+    .confirm-value { font-weight: var(--font-weight-medium); color: var(--color-gray-800); }
+
+    .confirm-amount {
+      text-align: center;
+      padding: var(--spacing-4) 0;
+      border-bottom: 1px solid var(--color-gray-200);
+      margin-bottom: var(--spacing-4);
+    }
+
+    .confirm-amount-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary-600);
+    }
+
+    /* Success state */
+    .success-container {
+      text-align: center;
+      padding: var(--spacing-8) var(--spacing-4);
+    }
+
+    .success-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--color-success-50);
+      color: var(--color-success-500);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--spacing-6);
+      animation: successBounce 0.5s ease-out;
+    }
+
+    .success-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-2);
+    }
+
+    .success-subtitle {
+      font-size: var(--font-size-base);
+      color: var(--color-gray-500);
+      margin-bottom: var(--spacing-6);
+    }
+
+    /* Nav buttons */
+    .form-nav {
+      display: flex;
+      gap: var(--spacing-3);
+      margin-top: var(--spacing-6);
+    }
+
+    .btn-next { background:var(--color-primary-600);color:white;border:none;flex:1;height:44px;border-radius:var(--radius-md);font-weight:var(--font-weight-semibold);cursor:pointer;transition:background var(--transition-fast); }
+    .btn-next:hover { background:var(--color-primary-700); }
+    .btn-next:disabled { opacity:0.5;cursor:not-allowed; }
+    .btn-prev { background:transparent;color:var(--color-gray-600);border:1px solid var(--color-gray-300);flex:1;height:44px;border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;transition:background var(--transition-fast); }
+    .btn-prev:hover { background:var(--color-gray-50); }
+    .btn-confirm { background:var(--color-success-600);color:white;border:none;flex:1;height:44px;border-radius:var(--radius-md);font-weight:var(--font-weight-semibold);cursor:pointer;transition:background var(--transition-fast); }
+    .btn-confirm:hover { background:var(--color-success-700); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link active" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Nueva Transferencia</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="transfer-container">
+        <h1 class="page-title">Nueva Transferencia</h1>
+
+        <!-- Step indicator -->
+        <div class="steps" aria-label="Pasos de transferencia">
+          <div class="step-item active" id="stepInd1"><div class="step-circle">1</div></div>
+          <div class="step-line" id="line1"></div>
+          <div class="step-item" id="stepInd2"><div class="step-circle">2</div></div>
+          <div class="step-line" id="line2"></div>
+          <div class="step-item" id="stepInd3"><div class="step-circle">3</div></div>
+          <div class="step-line" id="line3"></div>
+          <div class="step-item" id="stepInd4"><div class="step-circle">4</div></div>
+        </div>
+
+        <div class="form-card">
+          <!-- Step 1: Source & Beneficiary -->
+          <div class="form-section active" id="section1">
+            <div class="form-section-title">¿Desde dónde envías?</div>
+            <div class="form-section-subtitle">Selecciona la cuenta origen</div>
+
+            <div class="account-option selected" onclick="selectAccount(this, 'checking')" tabindex="0">
+              <div class="account-option-icon">🏦</div>
+              <div class="account-option-info">
+                <div class="account-option-name">Cuenta Corriente</div>
+                <div class="account-option-detail">•••• 4523</div>
+              </div>
+              <div class="account-option-balance">$45,280.50</div>
+            </div>
+
+            <div class="account-option" onclick="selectAccount(this, 'savings')" tabindex="0">
+              <div class="account-option-icon" style="background:var(--color-success-50);color:var(--color-success-600);">🐷</div>
+              <div class="account-option-info">
+                <div class="account-option-name">Cuenta de Ahorro</div>
+                <div class="account-option-detail">•••• 7891</div>
+              </div>
+              <div class="account-option-balance">$128,450.00</div>
+            </div>
+
+            <div class="form-section-title" style="margin-top:var(--spacing-6);">¿A quién envías?</div>
+            <div class="form-section-subtitle">Selecciona un beneficiario</div>
+
+            <div class="beneficiary-list">
+              <div class="beneficiary-option selected" onclick="selectBeneficiary(this, 'maria')" tabindex="0">
+                <div class="beneficiary-avatar">ML</div>
+                <div class="beneficiary-name">María López</div>
+                <div class="beneficiary-account">•••• 5678</div>
+              </div>
+              <div class="beneficiary-option" onclick="selectBeneficiary(this, 'carlos')" tabindex="0">
+                <div class="beneficiary-avatar" style="background:var(--color-success-50);color:var(--color-success-600);">CR</div>
+                <div class="beneficiary-name">Carlos Ruiz</div>
+                <div class="beneficiary-account">•••• 9012</div>
+              </div>
+              <div class="beneficiary-option" onclick="selectBeneficiary(this, 'ana')" tabindex="0">
+                <div class="beneficiary-avatar" style="background:#f3e8ff;color:#7c3aed;">AG</div>
+                <div class="beneficiary-name">Ana García</div>
+                <div class="beneficiary-account">•••• 3456</div>
+              </div>
+            </div>
+
+            <div class="form-nav">
+              <button class="btn-next" onclick="nextStep(1)">Siguiente</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Amount & Details -->
+          <div class="form-section" id="section2">
+            <div class="form-section-title">Monto y detalles</div>
+            <div class="form-section-subtitle">Ingresa el monto a transferir</div>
+
+            <div class="form-field">
+              <label for="amount">Monto</label>
+              <input type="number" id="amount" placeholder="$0.00" min="1" step="0.01" style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);text-align:center;" required>
+              <div class="field-error">Ingresa un monto válido mayor a $0</div>
+              <div class="form-help-text">Máximo: $45,280.50</div>
+            </div>
+
+            <div class="form-field">
+              <label for="concept">Concepto (opcional)</label>
+              <input type="text" id="concept" placeholder="Ej: Pago de renta" maxlength="100">
+            </div>
+
+            <div class="form-field">
+              <label for="transferDate">Fecha de transferencia</label>
+              <select id="transferDate">
+                <option value="now">Ahora</option>
+                <option value="scheduled">Programar fecha</option>
+              </select>
+            </div>
+
+            <div class="form-nav">
+              <button class="btn-prev" onclick="prevStep(2)">Atrás</button>
+              <button class="btn-next" onclick="nextStep(2)">Revisar</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Confirm -->
+          <div class="form-section" id="section3">
+            <div class="form-section-title">Confirma tu transferencia</div>
+            <div class="form-section-subtitle">Revisa los datos antes de enviar</div>
+
+            <div class="confirm-summary">
+              <div class="confirm-amount">
+                <div class="confirm-amount-value" id="confirmAmount">$0.00</div>
+              </div>
+              <div class="confirm-row"><span class="confirm-label">De</span><span class="confirm-value" id="confirmFrom">Cuenta Corriente •••• 4523</span></div>
+              <div class="confirm-row"><span class="confirm-label">Para</span><span class="confirm-value" id="confirmTo">María López •••• 5678</span></div>
+              <div class="confirm-row"><span class="confirm-label">Concepto</span><span class="confirm-value" id="confirmConcept">-</span></div>
+              <div class="confirm-row"><span class="confirm-label">Fecha</span><span class="confirm-value">Inmediata</span></div>
+            </div>
+
+            <div class="form-field">
+              <label for="pinConfirm">Confirma con tu PIN</label>
+              <input type="password" id="pinConfirm" maxlength="4" pattern="[0-9]{4}" placeholder="••••" inputmode="numeric" required>
+              <div class="field-error">PIN incorrecto</div>
+            </div>
+
+            <div class="form-nav">
+              <button class="btn-prev" onclick="prevStep(3)">Atrás</button>
+              <button class="btn-confirm" onclick="executeTransfer()">Confirmar transferencia</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Success -->
+          <div class="form-section" id="section4">
+            <div class="success-container">
+              <div class="success-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="success-title">Transferencia enviada</div>
+              <div class="success-subtitle">Tu transferencia se procesó exitosamente</div>
+              <div style="background:var(--color-gray-50);border-radius:var(--radius-lg);padding:var(--spacing-5);text-align:left;margin-bottom:var(--spacing-6);">
+                <div class="confirm-row"><span class="confirm-label">Referencia</span><span class="confirm-value" style="font-family:var(--font-family-mono);">TXN-001299</span></div>
+                <div class="confirm-row"><span class="confirm-label">Monto</span><span class="confirm-value" id="receiptAmount">$0.00</span></div>
+                <div class="confirm-row"><span class="confirm-label">Estado</span><span class="confirm-value"><span class="badge badge-success">Completada</span></span></div>
+              </div>
+              <div style="display:flex;gap:var(--spacing-3);">
+                <button class="btn-prev" style="flex:1;" onclick="resetForm()">Nueva transferencia</button>
+                <button class="btn-next" style="flex:1;" onclick="window.location.href='dashboard.html'">Volver al dashboard</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    let currentStep = 1;
+    let selectedAccount = 'checking';
+    let selectedBeneficiary = 'maria';
+
+    function selectAccount(el, type) {
+      document.querySelectorAll('.account-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAccount = type;
+    }
+
+    function selectBeneficiary(el, id) {
+      document.querySelectorAll('.beneficiary-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedBeneficiary = id;
+    }
+
+    function nextStep(from) {
+      if (from === 2) {
+        const amount = parseFloat(document.getElementById('amount').value);
+        if (!amount || amount <= 0) {
+          document.getElementById('amount').parentElement.classList.add('error');
+          return;
+        }
+        document.getElementById('amount').parentElement.classList.remove('error');
+
+        // Update confirmation details
+        const fromText = selectedAccount === 'checking' ? 'Cuenta Corriente •••• 4523' : 'Ahorro •••• 7891';
+        const toNames = { maria: 'María López •••• 5678', carlos: 'Carlos Ruiz •••• 9012', ana: 'Ana García •••• 3456' };
+        const amountStr = '$' + amount.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+        document.getElementById('confirmFrom').textContent = fromText;
+        document.getElementById('confirmTo').textContent = toNames[selectedBeneficiary];
+        document.getElementById('confirmAmount').textContent = amountStr;
+        document.getElementById('confirmConcept').textContent = document.getElementById('concept').value || '-';
+        document.getElementById('receiptAmount').textContent = amountStr;
+      }
+
+      goToStep(from + 1);
+    }
+
+    function prevStep(from) { goToStep(from - 1); }
+
+    function goToStep(step) {
+      document.getElementById(`section${currentStep}`).classList.remove('active');
+      document.getElementById(`section${step}`).classList.add('active');
+
+      document.getElementById(`stepInd${currentStep}`).classList.remove('active');
+      if (step > currentStep) document.getElementById(`stepInd${currentStep}`).classList.add('completed');
+      else document.getElementById(`stepInd${currentStep}`).classList.remove('completed');
+      
+      document.getElementById(`stepInd${step}`).classList.add('active');
+      if (step > 1) document.getElementById(`line${step-1}`).classList.add('completed');
+
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function executeTransfer() {
+      const pin = document.getElementById('pinConfirm').value;
+      if (!/^\d{4}$/.test(pin)) {
+        document.getElementById('pinConfirm').parentElement.classList.add('error');
+        return;
+      }
+      document.getElementById('pinConfirm').parentElement.classList.remove('error');
+
+      // Simulate API call
+      await new Promise(r => setTimeout(r, 2000));
+      goToStep(4);
+    }
+
+    function resetForm() {
+      document.getElementById('amount').value = '';
+      document.getElementById('concept').value = '';
+      document.getElementById('pinConfirm').value = '';
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.step-item').forEach(s => { s.classList.remove('active','completed'); });
+      document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
+      currentStep = 1;
+      document.getElementById('section1').classList.add('active');
+      document.getElementById('stepInd1').classList.add('active');
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') window.history.back(); });
+  </script>
+</body>
+</html>

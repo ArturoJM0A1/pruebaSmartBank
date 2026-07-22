@@ -1,0 +1,282 @@
+/* ==========================================================================
+   SmartBank Utility Classes
+   
+   WHY utility-first CSS?
+   Utility CSS (like Tailwind CSS) provides small, single-purpose classes
+   that can be composed to create any design. 
+   
+   Pros:
+   - Fast development: No context switching between HTML and CSS
+   - Small CSS bundle: Utilities are shared, no duplicate styles
+   - Consistent design: All values come from the same design tokens
+   - Easy to maintain: Change a token, all utilities update
+   
+   Cons:
+   - HTML can become verbose with many classes
+   - Less semantic: class="text-lg font-bold text-gray-800" vs class="heading"
+   - Learning curve for utility class names
+   
+   Our approach: Hybrid - use utilities for simple adjustments,
+   component CSS for complex components.
+   ========================================================================== */
+
+/* ========================================================================
+   DISPLAY UTILITIES
+   
+   Control the display property of elements.
+   Common values: block, inline, inline-block, flex, grid, none
+   
+   WHY display utilities?
+   Display is the most fundamental layout property.
+   Having utility classes avoids writing custom CSS for common adjustments.
+   ======================================================================== */
+.d-none { display: none; }
+.d-block { display: block; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+.d-flex { display: flex; }
+.d-inline-flex { display: inline-flex; }
+.d-grid { display: grid; }
+
+/* ========================================================================
+   POSITION UTILITIES
+   
+   Positioning is essential for overlays, modals, tooltips, etc.
+   Static is default. Relative creates a positioning context.
+   Absolute removes from flow. Fixed is viewport-relative.
+   Sticky combines relative and fixed.
+   ======================================================================== */
+.position-static { position: static; }
+.position-relative { position: relative; }
+.position-absolute { position: absolute; }
+.position-fixed { position: fixed; }
+.position-sticky { position: sticky; }
+
+/* Inset utilities (top, right, bottom, left) */
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.top-0 { top: 0; }
+.right-0 { right: 0; }
+.bottom-0 { bottom: 0; }
+.left-0 { left: 0; }
+
+/* ========================================================================
+   OVERFLOW UTILITIES
+   
+   Control content overflow behavior.
+   - hidden: clips content (no scrollbar)
+   - auto: shows scrollbar only when needed
+   - scroll: always shows scrollbar
+   - visible: overflows (default, can cause layout issues)
+   ======================================================================== */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-scroll { overflow: scroll; }
+.overflow-visible { overflow: visible; }
+
+/* Overflow in specific directions */
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-hidden { overflow-y: hidden; }
+
+/* ========================================================================
+   CURSOR UTILITIES
+   
+   Visual feedback for interactive elements.
+   Pointer indicates clickable. Not-allowed indicates disabled.
+   Move indicates draggable. Text indicates text-selectable.
+   ======================================================================== */
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+.cursor-move { cursor: move; }
+.cursor-text { cursor: text; }
+.cursor-default { cursor: default; }
+
+/* ========================================================================
+   OPACITY UTILITIES
+   
+   Control element transparency.
+   Useful for: disabled states, loading states, visual hierarchy.
+   ======================================================================== */
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: 0.25; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-100 { opacity: 1; }
+
+/* ========================================================================
+   SHADOW UTILITIES
+   
+   Apply shadows from design tokens.
+   Shadows create depth and hierarchy.
+   ======================================================================== */
+.shadow-none { box-shadow: none; }
+.shadow-xs { box-shadow: var(--shadow-xs); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* ========================================================================
+   BORDER UTILITIES
+   
+   Add borders to elements.
+   Useful for dividers, cards, and visual separation.
+   ======================================================================== */
+.border { border: 1px solid var(--color-gray-200); }
+.border-0 { border: 0; }
+.border-top { border-top: 1px solid var(--color-gray-200); }
+.border-bottom { border-bottom: 1px solid var(--color-gray-200); }
+.border-left { border-left: 1px solid var(--color-gray-200); }
+.border-right { border-right: 1px solid var(--color-gray-200); }
+
+.border-primary { border-color: var(--color-primary-500); }
+.border-success { border-color: var(--color-success-500); }
+.border-danger { border-color: var(--color-danger-500); }
+
+/* Border radius utilities */
+.rounded-none { border-radius: var(--radius-none); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius-md); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ========================================================================
+   WIDTH & HEIGHT UTILITIES
+   
+   Quick sizing without writing custom CSS.
+   ======================================================================== */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-screen { width: 100vw; }
+.w-fit { width: fit-content; }
+
+.h-full { height: 100%; }
+.h-auto { height: auto; }
+.h-screen { height: 100vh; }
+.min-h-screen { min-height: 100vh; }
+
+.max-w-xs { max-width: 20rem; }
+.max-w-sm { max-width: 24rem; }
+.max-w-md { max-width: 28rem; }
+.max-w-lg { max-width: 32rem; }
+.max-w-xl { max-width: 36rem; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-full { max-width: 100%; }
+
+/* ========================================================================
+   FLEXBOX-SPECIFIC UTILITIES
+   
+   Fine-grained flexbox controls.
+   ======================================================================== */
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-shrink { flex-shrink: 1; }
+.flex-grow-0 { flex-grow: 0; }
+.flex-grow { flex-grow: 1; }
+.flex-basis-0 { flex-basis: 0; }
+.flex-basis-auto { flex-basis: auto; }
+
+/* ========================================================================
+   GRID-SPECIFIC UTILITIES
+   
+   Fine-grained grid controls.
+   ======================================================================== */
+.col-span-1 { grid-column: span 1 / span 1; }
+.col-span-2 { grid-column: span 2 / span 2; }
+.col-span-3 { grid-column: span 3 / span 3; }
+.col-span-4 { grid-column: span 4 / span 4; }
+.col-span-full { grid-column: 1 / -1; }
+
+.row-span-1 { grid-row: span 1 / span 1; }
+.row-span-2 { grid-row: span 2 / span 2; }
+.row-span-3 { grid-row: span 3 / span 3; }
+
+/* ========================================================================
+   Z-INDEX UTILITIES
+   
+   Control stacking order of elements.
+   Based on our design token z-index scale.
+   ======================================================================== */
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+
+/* ========================================================================
+   TRANSITION UTILITIES
+   
+   Apply transitions from design tokens.
+   Use transition for smooth state changes.
+   ======================================================================== */
+.transition-none { transition: none; }
+.transition-fast { transition: all var(--transition-fast); }
+.transition-normal { transition: all var(--transition-normal); }
+.transition-slow { transition: all var(--transition-slow); }
+
+/* ========================================================================
+   SCROLL UTILITIES
+   
+   Control scroll behavior.
+   ======================================================================== */
+.scroll-smooth { scroll-behavior: smooth; }
+.scroll-auto { scroll-behavior: auto; }
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar styling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-300);
+  border-radius: 3px;
+}
+
+/* ========================================================================
+   ASPECT RATIO UTILITIES
+   
+   Maintain consistent aspect ratios for media.
+   ======================================================================== */
+.aspect-square { aspect-ratio: 1; }
+.aspect-video { aspect-ratio: 16 / 9; }
+.aspect-4-3 { aspect-ratio: 4 / 3; }
+
+/* ========================================================================
+   USER SELECT UTILITIES
+   
+   Control text selection behavior.
+   ======================================================================== */
+.select-none { user-select: none; }
+.select-all { user-select: all; }
+.select-text { user-select: text; }
+
+/* ========================================================================
+   POINTER EVENTS UTILITIES
+   
+   Control whether an element can receive pointer events.
+   Useful for overlay elements that should pass clicks through.
+   ======================================================================== */
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }

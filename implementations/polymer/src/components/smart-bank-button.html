@@ -1,0 +1,143 @@
+<!--
+  Smart Bank Button - Polymer Component
+  
+  POLYMER DATA BINDING:
+  - Two-way binding via {{}}
+  - One-way binding via [[]]
+  - Event handling: on-click="_handler"
+  - Automatic data binding in templates
+  
+  PROPERTIES pattern:
+  - Define in static get properties()
+  - Type checking built-in
+  - Default values
+  - Computed properties (automatic dependency tracking)
+  - Observers (watch for changes)
+-->
+<dom-module id="smart-bank-button">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        width: 100%;
+      }
+
+      button.small { padding: 8px 16px; font-size: 14px; }
+      button.medium { padding: 12px 24px; font-size: 16px; }
+      button.large { padding: 16px 32px; font-size: 18px; }
+
+      button.primary {
+        background: #1a73e8;
+        color: white;
+      }
+
+      button.primary:hover:not(:disabled) {
+        background: #1557b0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+
+      button.secondary {
+        background: #ffffff;
+        color: #202124;
+        border: 1px solid #dadce0;
+      }
+
+      button.secondary:hover:not(:disabled) {
+        background: #f8f9fa;
+      }
+
+      button.danger {
+        background: #ea4335;
+        color: white;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
+    <button
+      class$="[[variant]] [[size]]"
+      disabled$="[[disabled]]"
+      on-click="_handleClick"
+    >
+      <span class$="[[loadingClass]]"></span>
+      <slot></slot>
+    </button>
+  </template>
+
+  <script>
+    class SmartBankButton extends Polymer.Element {
+      static get is() { return 'smart-bank-button'; }
+
+      static get properties() {
+        return {
+          variant: {
+            type: String,
+            value: 'primary',
+          },
+          size: {
+            type: String,
+            value: 'medium',
+          },
+          disabled: {
+            type: Boolean,
+            value: false,
+          },
+          loading: {
+            type: Boolean,
+            value: false,
+          },
+          loadingClass: {
+            type: String,
+            computed: '_getLoadingClass(loading)',
+          },
+        };
+      }
+
+      _getLoadingClass(loading) {
+        return loading ? 'spinner' : '';
+      }
+
+      _handleClick(event) {
+        if (this.disabled || this.loading) {
+          return;
+        }
+
+        // WHY fire() instead of dispatchEvent?
+        // Polymer's fire() is a convenience method
+        // Creates CustomEvent with bubbling and composed
+        this.fire('button-click', { originalEvent: event });
+      }
+    }
+
+    window.customElements.define(SmartBankButton.is, SmartBankButton);
+  </script>
+</dom-module>

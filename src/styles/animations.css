@@ -1,0 +1,421 @@
+/* ==========================================================================
+   SmartBank Animations
+   
+   CSS Animations vs JS Animations:
+   - CSS animations: Better performance, GPU-accelerated, declarative
+   - JS animations: More control, can respond to complex conditions
+   
+   Use CSS animations for:
+   - Simple transitions (fade, slide, scale)
+   - Loading states (spinner, skeleton)
+   - Micro-interactions (hover effects)
+   
+   Use JS animations for:
+   - Complex sequences
+   - Physics-based animations
+   - Scroll-triggered animations
+   - Page transitions with routing
+   
+   Performance tips:
+   - Only animate transform and opacity (GPU-accelerated)
+   - Avoid animating layout properties (width, height, margin)
+   - Use will-change for predictable animations
+   - Prefer transform: translate() over top/left
+   - Use requestAnimationFrame for JS animations
+   ========================================================================== */
+
+/* ========================================================================
+   BASE ANIMATION KEYFRAMES
+   
+   These are the building blocks for more complex animations.
+   Each keyframe defines the start and end states of an animation.
+   ======================================================================== */
+
+/* Fade animations - most performant (only opacity) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide animations - use transform for performance */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Scale animations */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* ========================================================================
+   LOADING ANIMATIONS
+   
+   Spinners, pulse effects, and skeleton loading.
+   These indicate to users that something is happening.
+   ======================================================================== */
+
+/* Spinner rotation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse effect - breathing animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Bounce animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Skeleton shimmer - creates loading placeholder effect */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ========================================================================
+   ERROR / FEEDBACK ANIMATIONS
+   
+   Shake for errors, success checkmark animation.
+   Visual feedback helps users understand what happened.
+   ======================================================================== */
+
+/* Shake - indicates error (like wrong password) */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Success bounce - indicates completion */
+@keyframes successBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Checkmark drawing animation */
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ========================================================================
+   ANIMATION UTILITY CLASSES
+   
+   Apply animations to elements using these classes.
+   Duration and timing can be customized with inline styles.
+   ======================================================================== */
+
+/* Fade animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s ease-out forwards;
+}
+
+/* Slide animations */
+.animate-slide-in-up {
+  animation: slideInUp 0.3s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Scale animations */
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse */
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Bounce */
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* Shake - error feedback */
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Success */
+.animate-success {
+  animation: successBounce 0.4s ease-out forwards;
+}
+
+/* ========================================================================
+   STAGGERED ANIMATIONS
+   
+   Create delayed animations for lists of items.
+   Each item animates slightly after the previous one.
+   This creates a cascading effect that looks professional.
+   
+   Usage: <div class="stagger-item" style="--stagger-index: 0">
+          <div class="stagger-item" style="--stagger-index: 1">
+          etc.
+   ======================================================================== */
+.stagger-item {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+  animation-delay: calc(var(--stagger-index, 0) * 0.05s);
+}
+
+/* ========================================================================
+   HOVER TRANSITIONS
+   
+   Smooth transitions for interactive elements.
+   Only use transitions on properties that don't trigger layout.
+   
+   Good for transitions: transform, opacity, color, background-color
+   Bad for transitions: width, height, margin, padding (causes reflow)
+   ======================================================================== */
+
+/* Scale on hover */
+.hover-scale {
+  transition: transform var(--transition-fast);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-scale:active {
+  transform: scale(0.98);
+}
+
+/* Lift on hover (shadow + slight translate) */
+.hover-lift {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Glow effect (border/box-shadow pulse) */
+.hover-glow {
+  transition: box-shadow var(--transition-fast);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+/* ========================================================================
+   SCROLL-TRIGGERED ANIMATIONS
+   
+   These classes are added by JavaScript when elements enter viewport.
+   Uses IntersectionObserver API (modern, performant).
+   
+   Usage in JS:
+   const observer = new IntersectionObserver((entries) => {
+     entries.forEach(entry => {
+       if (entry.isIntersecting) {
+         entry.target.classList.add('animate-visible');
+       }
+     });
+   });
+   ======================================================================== */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.animate-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================================================
+   REDUCED MOTION SUPPORT
+   
+   Respect user's system preference for reduced motion.
+   CRITICAL for accessibility: some users have vestibular disorders
+   that make animations uncomfortable or even cause nausea.
+   ======================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

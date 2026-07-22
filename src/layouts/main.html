@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SmartBank - Tu banco digital seguro y moderno">
+  <meta name="theme-color" content="#1e40af">
+  <title>SmartBank - Banco Digital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 
+    CSS Loading Order:
+    1. Variables first (all other files reference these)
+    2. Reset (normalizes browser defaults)
+    3. Typography (text styles used by components)
+    4. Layout (grid/flex utilities)
+    5. Components (buttons, forms, cards, etc.)
+    6. Animations (transitions and keyframes)
+    7. Utilities (helper classes)
+    8. Dark theme (theme overrides)
+    9. Responsive (media queries, must be last to override)
+  -->
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/reset.css">
+  <link rel="stylesheet" href="styles/typography.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/animations.css">
+  <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/dark-theme.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+  <!--
+    Main Application Layout (SPA Shell)
+    
+    This is the entry point for the SPA (Single Page Application).
+    WHY a shell layout?
+    - The shell stays loaded while content changes
+    - Header, sidebar, and footer remain persistent
+    - Only the main content area changes between pages
+    - Faster navigation (no full page reloads)
+    
+    Architecture:
+    - index.html loads the login page by default
+    - After authentication, router loads pages into #appContent
+    - The layout shell stays mounted during navigation
+  -->
+  <div id="appRoot">
+    <!-- 
+      App Shell Structure:
+      ┌──────────┬──────────────────────┐
+      │          │  Header (persistent) │
+      │ Sidebar  ├──────────────────────┤
+      │          │  #appContent         │
+      │ (nav)    │  (dynamic content)   │
+      │          │                      │
+      └──────────┴──────────────────────┘
+    -->
+    <div class="app-layout">
+      <!-- Sidebar navigation -->
+      <aside class="app-sidebar" id="appSidebar" role="navigation" aria-label="Navegación principal">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+            <rect width="80" height="80" rx="16" fill="#3b82f6"/>
+            <path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/>
+          </svg>
+          <span class="sidebar-logo-text">SmartBank</span>
+        </div>
+
+        <!-- Main navigation -->
+        <nav class="sidebar-nav" id="sidebarNav">
+          <ul class="sidebar-nav-list">
+            <!-- Navigation items are rendered dynamically by the router -->
+          </ul>
+        </nav>
+
+        <!-- Bottom navigation (settings, help) -->
+        <div class="sidebar-footer">
+          <nav aria-label="Configuración">
+            <ul class="sidebar-nav-list">
+              <li>
+                <a href="pages/notifications.html" class="sidebar-link" data-page="notifications">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  <span>Notificaciones</span>
+                </a>
+              </li>
+              <li>
+                <a href="pages/settings.html" class="sidebar-link" data-page="settings">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  </svg>
+                  <span>Configuración</span>
+                </a>
+              </li>
+              <li>
+                <a href="pages/profile.html" class="sidebar-link" data-page="profile">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <span>Mi perfil</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Header (persistent across navigation) -->
+      <header class="app-header" id="appHeader" role="banner">
+        <div class="header-left">
+          <!-- Mobile menu toggle -->
+          <button class="mobile-menu-btn hide-desktop" id="menuToggle" aria-label="Abrir menú de navegación">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+
+          <!-- Search bar -->
+          <div class="header-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="search"
+              id="headerSearch"
+              placeholder="Buscar..."
+              aria-label="Buscar en la aplicación"
+            >
+            <kbd class="search-shortcut hide-mobile">Ctrl+K</kbd>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Notifications bell -->
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notificaciones (3 sin leer)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="header-badge" id="notifBadge">3</span>
+          </button>
+
+          <!-- User avatar -->
+          <button class="header-user" id="userMenuBtn" aria-label="Menú de usuario">
+            <div class="avatar avatar-md" id="userAvatar">JP</div>
+            <span class="header-user-name hide-mobile" id="userName">Juan Pérez</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main content area - pages are rendered here -->
+      <main class="app-main" id="appContent" role="main" aria-live="polite">
+        <!-- Dynamic content loaded by router -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast notification container (persistent, positioned fixed) -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true">
+    <!-- Toasts are appended here by JavaScript -->
+  </div>
+
+  <!-- Modal container (for global modals) -->
+  <div class="modal-backdrop" id="globalModalBackdrop" aria-hidden="true"></div>
+  <div class="modal" id="globalModal" role="dialog" aria-modal="true" aria-labelledby="globalModalTitle">
+    <div class="modal-header">
+      <h3 class="modal-title" id="globalModalTitle">Modal</h3>
+      <button class="modal-close" id="globalModalClose" aria-label="Cerrar modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="globalModalBody">
+      <!-- Modal content rendered dynamically -->
+    </div>
+    <div class="modal-footer" id="globalModalFooter">
+      <!-- Modal actions rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- 
+    Application Scripts
+    
+    Loading order matters:
+    1. Utilities (no dependencies)
+    2. Store (state management, depends on utilities)
+    3. API (network requests, depends on store)
+    4. Router (page navigation, depends on store, API)
+    5. Components (UI components, depends on store, router)
+    6. App (initialization, depends on all above)
+  -->
+  <script src="app.js"></script>
+
+  <!-- Inline navigation config (would normally be in app.js) -->
+  <script>
+    /**
+     * Navigation configuration for the sidebar.
+     * WHY centralized nav config?
+     * - Single source of truth for all navigation items
+     * - Router and sidebar both reference the same config
+     * - Easy to add/remove/reorder navigation items
+     */
+    const NAV_ITEMS = [
+      { id: 'dashboard', label: 'Dashboard', icon: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>', file: 'pages/dashboard.html' },
+      { id: 'accounts', label: 'Cuentas', icon: '<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>', file: 'pages/accounts.html' },
+      { id: 'cards', label: 'Tarjetas', icon: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', file: 'pages/cards.html' },
+      { id: 'transfers', label: 'Transferencias', icon: '<line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>', file: 'pages/transfers.html' },
+      { id: 'services', label: 'Servicios', icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>', file: 'pages/services.html' },
+      { id: 'beneficiaries', label: 'Beneficiarios', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', file: 'pages/beneficiaries.html' },
+    ];
+
+    /**
+     * Render sidebar navigation from config.
+     * This ensures the sidebar matches the NAV_ITEMS config.
+     */
+    function renderSidebarNav() {
+      const navList = document.querySelector('#sidebarNav .sidebar-nav-list');
+      if (!navList) return;
+
+      navList.innerHTML = NAV_ITEMS.map(item => `
+        <li>
+          <a href="${item.file}" class="sidebar-link" data-page="${item.id}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              ${item.icon}
+            </svg>
+            <span>${item.label}</span>
+          </a>
+        </li>
+      `).join('');
+    }
+
+    // Initialize sidebar
+    renderSidebarNav();
+
+    // Mobile menu toggle
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      document.getElementById('appSidebar').classList.toggle('open');
+    });
+
+    // Close sidebar on navigation (mobile)
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('appSidebar').classList.remove('open');
+      });
+    });
+
+    // Search keyboard shortcut
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        window.location.href = 'pages/search.html';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beneficiarios - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /*
+      Beneficiaries Management:
+      CRUD (Create, Read, Update, Delete) pattern.
+      WHY? Users need to manage their contacts for transfers.
+    */
+    .page-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--spacing-6);flex-wrap:wrap;gap:var(--spacing-4); }
+    .page-title { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800); }
+
+    .beneficiaries-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--spacing-4); }
+
+    .beneficiary-card {
+      background:var(--color-gray-0);border:1px solid var(--color-gray-200);border-radius:var(--radius-xl);
+      padding:var(--spacing-5);display:flex;flex-direction:column;align-items:center;text-align:center;
+      transition:all var(--transition-fast);position:relative;
+    }
+    .beneficiary-card:hover { box-shadow:var(--shadow-md);transform:translateY(-2px); }
+
+    .benef-avatar { width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-bold);font-size:var(--font-size-xl);margin-bottom:var(--spacing-3); }
+    .benef-name { font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);margin-bottom:var(--spacing-1); }
+    .benef-account { font-size:var(--font-size-sm);color:var(--color-gray-500);font-family:var(--font-family-mono);margin-bottom:var(--spacing-4); }
+    .benef-bank { font-size:var(--font-size-xs);color:var(--color-gray-400);margin-bottom:var(--spacing-4); }
+
+    .benef-actions { display:flex;gap:var(--spacing-2);width:100%; }
+    .benef-btn { flex:1;padding:var(--spacing-2);border:1px solid var(--color-gray-200);border-radius:var(--radius-md);background:var(--color-gray-0);color:var(--color-gray-600);font-size:var(--font-size-sm);cursor:pointer;transition:all var(--transition-fast); }
+    .benef-btn:hover { background:var(--color-gray-50);border-color:var(--color-gray-300); }
+    .benef-btn.danger { color:var(--color-danger-600);border-color:var(--color-danger-200); }
+    .benef-btn.danger:hover { background:var(--color-danger-50); }
+
+    /* Modal for add/edit */
+    .modal-bg { position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:none;align-items:center;justify-content:center;padding:var(--spacing-4); }
+    .modal-bg.active { display:flex; }
+    .modal-box { background:var(--color-gray-0);border-radius:var(--radius-xl);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:scaleIn 0.2s ease-out; }
+    .modal-hdr { display:flex;align-items:center;justify-content:space-between;padding:var(--spacing-5) var(--spacing-6);border-bottom:1px solid var(--color-gray-100); }
+    .modal-bdy { padding:var(--spacing-6); }
+
+    .form-field { margin-bottom:var(--spacing-5); }
+    .form-field label { display:block;margin-bottom:var(--spacing-2);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-700); }
+    .form-field input, .form-field select { width:100%;height:40px;padding:0 var(--spacing-3);border:1px solid var(--color-gray-300);border-radius:var(--radius-md);font-size:var(--font-size-base);transition:border-color var(--transition-fast),box-shadow var(--transition-fast); }
+    .form-field input:focus, .form-field select:focus { outline:none;border-color:var(--color-primary-500);box-shadow:0 0 0 3px var(--color-primary-100); }
+    .form-field .field-error { font-size:var(--font-size-sm);color:var(--color-danger-600);margin-top:var(--spacing-1);display:none; }
+    .form-field.error input { border-color:var(--color-danger-500); }
+    .form-field.error .field-error { display:block; }
+
+    /* Delete confirmation */
+    .confirm-msg { font-size:var(--font-size-sm);color:var(--color-gray-600);text-align:center;padding:var(--spacing-4);line-height:var(--line-height-relaxed); }
+
+    .btn-primary { background:var(--color-primary-600);color:white;border:none;height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm);transition:background var(--transition-fast); }
+    .btn-primary:hover { background:var(--color-primary-700); }
+    .btn-danger { background:var(--color-danger-600);color:white;border:none;height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm);transition:background var(--transition-fast); }
+    .btn-danger:hover { background:var(--color-danger-700); }
+    .btn-ghost { background:transparent;color:var(--color-gray-600);border:1px solid var(--color-gray-300);height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm); }
+    .btn-ghost:hover { background:var(--color-gray-50); }
+
+    .empty-state { text-align:center;padding:var(--spacing-12) var(--spacing-4);color:var(--color-gray-400); }
+    .empty-state svg { margin:0 auto var(--spacing-4);opacity:0.3; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link active" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Beneficiarios</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="page-header">
+        <h1 class="page-title">Mis Beneficiarios</h1>
+        <button class="btn-primary" onclick="openAddModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:var(--spacing-1);"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar beneficiario
+        </button>
+      </div>
+
+      <div class="beneficiaries-grid" id="benefGrid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-bg" id="formModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <h3 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);" id="modalTitle">Agregar beneficiario</h3>
+        <button onclick="closeModal()" style="padding:var(--spacing-2);border-radius:var(--radius-md);color:var(--color-gray-400);" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="modal-bdy">
+        <div class="form-field"><label for="bName">Nombre completo</label><input type="text" id="bName" placeholder="María López"><div class="field-error">El nombre es requerido</div></div>
+        <div class="form-field"><label for="bEmail">Correo electrónico</label><input type="email" id="bEmail" placeholder="maria@email.com"><div class="field-error">Ingresa un correo válido</div></div>
+        <div class="form-field"><label for="bAccount">Número de cuenta</label><input type="text" id="bAccount" placeholder="1234567890"><div class="field-error">El número de cuenta es requerido</div></div>
+        <div class="form-field"><label for="bBank">Banco</label>
+          <select id="bBank"><option value="">Seleccionar banco</option><option>SmartBank</option><option>Banorte</option><option>Santander</option><option>BBVA</option><option>HSBC</option><option>Otro</option></select>
+          <div class="field-error">Selecciona un banco</div>
+        </div>
+        <div style="display:flex;gap:var(--spacing-3);margin-top:var(--spacing-4);">
+          <button class="btn-ghost" style="flex:1;" onclick="closeModal()">Cancelar</button>
+          <button class="btn-primary" style="flex:1;" id="saveBtn" onclick="saveBeneficiary()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-bg" id="deleteModal" onclick="if(event.target===this)closeDeleteModal()">
+    <div class="modal-box" style="max-width:380px;">
+      <div class="modal-bdy" style="text-align:center;padding:var(--spacing-8);">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-danger-50);color:var(--color-danger-500);display:flex;align-items:center;justify-content:center;margin:0 auto var(--spacing-4);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <h3 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);margin-bottom:var(--spacing-2);">Eliminar beneficiario</h3>
+        <div class="confirm-msg" id="deleteMsg">¿Estás seguro de que deseas eliminar este beneficiario?</div>
+        <div style="display:flex;gap:var(--spacing-3);margin-top:var(--spacing-4);">
+          <button class="btn-ghost" style="flex:1;" onclick="closeDeleteModal()">Cancelar</button>
+          <button class="btn-danger" style="flex:1;" onclick="confirmDelete()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    // Beneficiary CRUD operations
+    let beneficiaries = [
+      { id: 1, name: 'María López', email: 'maria@email.com', account: '5678901234', bank: 'SmartBank', initials: 'ML', color: 'var(--color-primary-100)', textColor: 'var(--color-primary-600)' },
+      { id: 2, name: 'Carlos Ruiz', email: 'carlos@email.com', account: '9012345678', bank: 'BBVA', initials: 'CR', color: 'var(--color-success-50)', textColor: 'var(--color-success-600)' },
+      { id: 3, name: 'Ana García', email: 'ana@email.com', account: '3456789012', bank: 'Banorte', initials: 'AG', color: '#f3e8ff', textColor: '#7c3aed' },
+    ];
+
+    let editingId = null;
+    let deletingId = null;
+
+    function renderGrid() {
+      const grid = document.getElementById('benefGrid');
+      if (beneficiaries.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>No tienes beneficiarios registrados</p></div>';
+        return;
+      }
+      grid.innerHTML = beneficiaries.map(b => `
+        <article class="beneficiary-card">
+          <div class="benef-avatar" style="background:${b.color};color:${b.textColor};">${b.initials}</div>
+          <div class="benef-name">${b.name}</div>
+          <div class="benef-account">•••• ${b.account.slice(-4)}</div>
+          <div class="benef-bank">${b.bank}</div>
+          <div class="benef-actions">
+            <button class="benef-btn" onclick="openEditModal(${b.id})">Editar</button>
+            <button class="benef-btn danger" onclick="openDeleteModal(${b.id})">Eliminar</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function openAddModal() {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = 'Agregar beneficiario';
+      document.getElementById('bName').value = '';
+      document.getElementById('bEmail').value = '';
+      document.getElementById('bAccount').value = '';
+      document.getElementById('bBank').value = '';
+      document.getElementById('formModal').classList.add('active');
+    }
+
+    function openEditModal(id) {
+      const b = beneficiaries.find(x => x.id === id);
+      if (!b) return;
+      editingId = id;
+      document.getElementById('modalTitle').textContent = 'Editar beneficiario';
+      document.getElementById('bName').value = b.name;
+      document.getElementById('bEmail').value = b.email;
+      document.getElementById('bAccount').value = b.account;
+      document.getElementById('bBank').value = b.bank;
+      document.getElementById('formModal').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('formModal').classList.remove('active'); }
+
+    function saveBeneficiary() {
+      const name = document.getElementById('bName').value.trim();
+      const email = document.getElementById('bEmail').value.trim();
+      const account = document.getElementById('bAccount').value.trim();
+      const bank = document.getElementById('bBank').value;
+
+      let valid = true;
+      document.querySelectorAll('.form-field').forEach(f => f.classList.remove('error'));
+      if (!name) { document.getElementById('bName').parentElement.classList.add('error'); valid = false; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('bEmail').parentElement.classList.add('error'); valid = false; }
+      if (!account) { document.getElementById('bAccount').parentElement.classList.add('error'); valid = false; }
+      if (!bank) { document.getElementById('bBank').parentElement.classList.add('error'); valid = false; }
+      if (!valid) return;
+
+      const colors = ['var(--color-primary-100)|var(--color-primary-600)', 'var(--color-success-50)|var(--color-success-600)', '#f3e8ff|#7c3aed', 'var(--color-warning-50)|var(--color-warning-600)'];
+
+      if (editingId) {
+        const b = beneficiaries.find(x => x.id === editingId);
+        if (b) { b.name = name; b.email = email; b.account = account; b.bank = bank; b.initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
+      } else {
+        const colorPair = colors[beneficiaries.length % colors.length].split('|');
+        beneficiaries.push({ id: Date.now(), name, email, account, bank, initials: name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(), color: colorPair[0], textColor: colorPair[1] });
+      }
+
+      closeModal();
+      renderGrid();
+      showToast(editingId ? 'Editado' : 'Agregado', `Beneficiario ${editingId ? 'editado' : 'agregado'} exitosamente`, 'success');
+    }
+
+    function openDeleteModal(id) { deletingId = id; const b = beneficiaries.find(x=>x.id===id); document.getElementById('deleteMsg').textContent = `¿Eliminar a ${b?.name}? Esta acción no se puede deshacer.`; document.getElementById('deleteModal').classList.add('active'); }
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); deletingId = null; }
+    function confirmDelete() { beneficiaries = beneficiaries.filter(b => b.id !== deletingId); closeDeleteModal(); renderGrid(); showToast('Eliminado', 'Beneficiario eliminado', 'success'); }
+
+    function showToast(title, message, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDeleteModal(); } });
+    renderGrid();
+  </script>
+</body>
+</html>

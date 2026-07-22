@@ -1,0 +1,26 @@
+{
+  "name": "smartbank-polymer",
+  "version": "1.0.0",
+  "description": "SmartBank implementation using Polymer (legacy Web Components framework)",
+  "type": "module",
+  "scripts": {
+    "dev": "polymer serve",
+    "build": "polymer build",
+    "test": "polymer test"
+  },
+  "dependencies": {
+    "@polymer/polymer": "^3.5.0",
+    "@polymer/iron-pages": "^3.0.0",
+    "@polymer/iron-selector": "^3.0.0",
+    "@polymer/paper-input": "^3.2.0",
+    "@polymer/paper-button": "^3.0.0",
+    "@polymer/paper-card": "^3.0.0",
+    "@polymer/paper-dialog": "^3.0.0",
+    "@polymer/paper-toast": "^3.0.0",
+    "@polymer/polymer/lib/elements/dom-repeat.js": "^3.5.0"
+  },
+  "devDependencies": {
+    "@web/dev-server": "^0.3.0",
+    "polymer-cli": "^1.9.0"
+  }
+}

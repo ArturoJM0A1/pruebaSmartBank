@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SmartBank - Inicia sesión en tu cuenta bancaria digital">
+  <meta name="theme-color" content="#1e40af">
+  <title>Iniciar Sesión - SmartBank</title>
+
+  <!-- Preconnect to font CDN for faster loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 
+    CSS Files loaded in dependency order:
+    1. variables.css - design tokens (used by all other files)
+    2. reset.css - normalize browser defaults
+    3. typography.css - text styles
+    4. layout.css - grid/flex utilities
+    5. components.css - UI components
+    6. animations.css - transitions and keyframes
+    7. utilities.css - helper classes
+    8. responsive.css - media queries (must come last to override)
+  -->
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+
+  <!-- 
+    Login page styles are inline for simplicity.
+    In production, these would be in a separate login.css file
+    loaded via the build system (Webpack, Vite, etc.)
+  -->
+  <style>
+    /* 
+      WHY this gradient background?
+      Blue gradients convey trust and professionalism.
+      The subtle pattern adds visual interest without distraction.
+    */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 50%, #3b82f6 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative background circles - adds depth and visual interest */
+    .login-page::before,
+    .login-page::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 0;
+    }
+
+    .login-page::before {
+      width: 600px;
+      height: 600px;
+      top: -200px;
+      right: -100px;
+    }
+
+    .login-page::after {
+      width: 400px;
+      height: 400px;
+      bottom: -100px;
+      left: -100px;
+    }
+
+    /* Left panel - branding */
+    .login-branding {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: var(--spacing-8);
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-branding-logo {
+      margin-bottom: var(--spacing-8);
+    }
+
+    .login-branding-logo svg {
+      width: 80px;
+      height: 80px;
+    }
+
+    .login-branding-title {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--spacing-4);
+      text-align: center;
+    }
+
+    .login-branding-subtitle {
+      font-size: var(--font-size-lg);
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      max-width: 400px;
+      line-height: var(--line-height-relaxed);
+    }
+
+    .login-branding-features {
+      margin-top: var(--spacing-12);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-4);
+    }
+
+    .login-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      font-size: var(--font-size-base);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .login-feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Right panel - login form */
+    .login-form-panel {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--spacing-8);
+      background: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-form-container {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .login-form-header {
+      margin-bottom: var(--spacing-8);
+    }
+
+    .login-form-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-2);
+    }
+
+    .login-form-subtitle {
+      font-size: var(--font-size-base);
+      color: var(--color-gray-500);
+    }
+
+    .login-form-group {
+      margin-bottom: var(--spacing-5);
+    }
+
+    .login-form-group label {
+      display: block;
+      margin-bottom: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-700);
+    }
+
+    .login-form-group input {
+      width: 100%;
+      height: var(--input-height-lg);
+      padding: 0 var(--spacing-4);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .login-form-group input:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px var(--color-primary-100);
+    }
+
+    .login-form-group input::placeholder {
+      color: var(--color-gray-400);
+    }
+
+    /* Error state for inputs */
+    .login-form-group input.error {
+      border-color: var(--color-danger-500);
+    }
+
+    .login-error-message {
+      display: none;
+      margin-top: var(--spacing-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-danger-600);
+      align-items: center;
+      gap: var(--spacing-1);
+    }
+
+    .login-error-message.show {
+      display: flex;
+    }
+
+    /* Form options row (remember me + forgot password) */
+    .login-form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-6);
+    }
+
+    .login-remember {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-600);
+    }
+
+    .login-remember input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-primary-600);
+    }
+
+    .login-forgot {
+      font-size: var(--font-size-sm);
+      color: var(--color-primary-600);
+      font-weight: var(--font-weight-medium);
+      transition: color var(--transition-fast);
+    }
+
+    .login-forgot:hover {
+      color: var(--color-primary-700);
+    }
+
+    /* Submit button */
+    .login-submit {
+      width: 100%;
+      height: var(--btn-height-lg);
+      background-color: var(--color-primary-600);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-submit:hover:not(:disabled) {
+      background-color: var(--color-primary-700);
+    }
+
+    .login-submit:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .login-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Loading spinner inside button */
+    .login-submit .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+
+    .login-submit.loading .btn-text {
+      visibility: hidden;
+    }
+
+    .login-submit.loading .spinner {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Register link */
+    .login-register {
+      text-align: center;
+      margin-top: var(--spacing-6);
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-500);
+    }
+
+    .login-register a {
+      color: var(--color-primary-600);
+      font-weight: var(--font-weight-medium);
+      text-decoration: underline;
+    }
+
+    .login-register a:hover {
+      color: var(--color-primary-700);
+    }
+
+    /* Divider */
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin: var(--spacing-6) 0;
+      color: var(--color-gray-400);
+      font-size: var(--font-size-sm);
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background-color: var(--color-gray-200);
+    }
+
+    /* Footer */
+    .login-footer {
+      margin-top: var(--spacing-8);
+      text-align: center;
+      font-size: var(--font-size-xs);
+      color: var(--color-gray-400);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .login-page {
+        flex-direction: column;
+      }
+
+      .login-branding {
+        display: none;
+      }
+
+      .login-form-panel {
+        max-width: 100%;
+        min-height: 100vh;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .login-branding {
+        padding: var(--spacing-6);
+      }
+
+      .login-branding-title {
+        font-size: var(--font-size-3xl);
+      }
+
+      .login-branding-features {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    Login Page Structure:
+    The login page is the SPA entry point. It's the first thing users see.
+    
+    Architecture notes:
+    - This is a standalone HTML file that bootstraps the SPA
+    - After successful login, the router loads the main app shell
+    - Form validation is done client-side before API calls
+    - Error messages come from the API response
+    
+    Auth flow:
+    1. User enters credentials
+    2. Client-side validation (email format, password length)
+    3. API call to /auth/login endpoint
+    4. On success: store JWT token, redirect to dashboard
+    5. On failure: display error message, retry
+  -->
+  <main class="login-page" role="main" aria-label="Iniciar Sesión">
+    <!-- Left branding panel (hidden on mobile) -->
+    <section class="login-branding" aria-hidden="true">
+      <div class="login-branding-logo">
+        <!-- SmartBank Logo SVG -->
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="80" height="80" rx="16" fill="rgba(255,255,255,0.15)"/>
+          <path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/>
+        </svg>
+      </div>
+      <h1 class="login-branding-title">SmartBank</h1>
+      <p class="login-branding-subtitle">
+        Tu banco digital seguro y moderno. Gestiona tus finanzas desde cualquier lugar.
+      </p>
+
+      <!-- Feature list - reinforces value proposition -->
+      <div class="login-branding-features">
+        <div class="login-feature">
+          <div class="login-feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span>Cifrado de extremo a extremo</span>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <span>Transferencias instantáneas</span>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <span>Protección 24/7</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right form panel -->
+    <section class="login-form-panel" aria-label="Formulario de inicio de sesión">
+      <div class="login-form-container">
+        <!-- Mobile logo (shown only on mobile) -->
+        <div class="hide-desktop" style="text-align: center; margin-bottom: var(--spacing-8);">
+          <svg width="48" height="48" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="80" height="80" rx="16" fill="#2563eb"/>
+            <path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <div class="login-form-header">
+          <h2 class="login-form-title">Bienvenido de vuelta</h2>
+          <p class="login-form-subtitle">Ingresa tus credenciales para acceder a tu cuenta</p>
+        </div>
+
+        <!-- 
+          Login form.
+          - action="#" means form submission is handled by JavaScript
+          - novalidate disables browser validation (we use custom JS validation)
+          - aria-describedby links inputs to error messages for screen readers
+        -->
+        <form id="loginForm" action="#" novalidate aria-label="Formulario de login">
+          <!-- 
+            Global error message for API errors.
+            This is shown when the API returns an error (e.g., wrong credentials).
+            aria-live="polite" tells screen readers to announce changes.
+          -->
+          <div id="loginGlobalError" class="login-error-message" role="alert" aria-live="polite" style="margin-bottom: var(--spacing-4); padding: var(--spacing-3); background: var(--color-danger-50); border-radius: var(--radius-md);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <span id="loginGlobalErrorText">Credenciales incorrectas. Intenta de nuevo.</span>
+          </div>
+
+          <!-- Email field -->
+          <div class="login-form-group">
+            <label for="email" class="form-label form-label-required">Correo electrónico</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="tu@email.com"
+              required
+              autocomplete="email"
+              aria-describedby="emailError"
+              aria-invalid="false"
+            >
+            <div id="emailError" class="login-error-message" role="alert">
+              <span>Por favor ingresa un correo electrónico válido</span>
+            </div>
+          </div>
+
+          <!-- Password field -->
+          <div class="login-form-group">
+            <label for="password" class="form-label form-label-required">Contraseña</label>
+            <div class="input-group">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="Ingresa tu contraseña"
+                required
+                minlength="8"
+                autocomplete="current-password"
+                aria-describedby="passwordError"
+                aria-invalid="false"
+              >
+              <!-- Password visibility toggle -->
+              <button
+                type="button"
+                class="input-action-right"
+                onclick="togglePasswordVisibility()"
+                aria-label="Mostrar contraseña"
+              >
+                <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div id="passwordError" class="login-error-message" role="alert">
+              <span>La contraseña debe tener al menos 8 caracteres</span>
+            </div>
+          </div>
+
+          <!-- Remember me + Forgot password -->
+          <div class="login-form-options">
+            <label class="login-remember">
+              <input type="checkbox" name="remember" id="remember">
+              <span>Recordarme</span>
+            </label>
+            <a href="#" class="login-forgot" onclick="handleForgotPassword(event)">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <!-- Submit button with loading state -->
+          <button type="submit" class="login-submit" id="loginBtn">
+            <span class="btn-text">Iniciar Sesión</span>
+            <div class="spinner" aria-hidden="true"></div>
+          </button>
+
+          <!-- Register link -->
+          <div class="login-register">
+            ¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a>
+          </div>
+        </form>
+
+        <div class="login-footer">
+          <p>&copy; 2024 SmartBank. Todos los derechos reservados.</p>
+          <p style="margin-top: var(--spacing-2);">
+            <a href="#" style="color: var(--color-gray-400); text-decoration: underline;">Términos</a> · 
+            <a href="#" style="color: var(--color-gray-400); text-decoration: underline;">Privacidad</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 
+    Login form JavaScript.
+    
+    WHY client-side validation?
+    - Immediate feedback (no server round-trip)
+    - Better UX (user sees errors instantly)
+    - Reduces server load (invalid requests don't reach API)
+    - Still validates on server (never trust client-side only!)
+    
+    Auth flow:
+    1. validateForm() - checks all fields
+    2. showLoading() - shows spinner, disables button
+    3. api.login() - sends credentials to server
+    4. On success: stores token, redirects to dashboard
+    5. On error: shows error message, enables retry
+  -->
+  <script>
+    // DOM element references
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const globalError = document.getElementById('loginGlobalError');
+    const globalErrorText = document.getElementById('loginGlobalErrorText');
+
+    /**
+     * Toggle password visibility.
+     * WHY? Users often want to see what they're typing.
+     * Security note: We only toggle the input type, not store the password.
+     */
+    function togglePasswordVisibility() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // Update icon (eye vs eye-off)
+      const eyeIcon = document.getElementById('eyeIcon');
+      if (type === 'text') {
+        eyeIcon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        `;
+      } else {
+        eyeIcon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      }
+    }
+
+    /**
+     * Validate email format.
+     * WHY regex? Standard email validation pattern.
+     * Note: Perfect email validation is impossible with regex alone,
+     * but this catches common mistakes.
+     */
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    /**
+     * Validate form fields.
+     * Returns true if all fields are valid.
+     * Shows/hides error messages for each field.
+     */
+    function validateForm() {
+      let isValid = true;
+
+      // Validate email
+      if (!validateEmail(emailInput.value)) {
+        document.getElementById('emailError').classList.add('show');
+        emailInput.classList.add('error');
+        emailInput.setAttribute('aria-invalid', 'true');
+        isValid = false;
+      } else {
+        document.getElementById('emailError').classList.remove('show');
+        emailInput.classList.remove('error');
+        emailInput.setAttribute('aria-invalid', 'false');
+      }
+
+      // Validate password
+      if (passwordInput.value.length < 8) {
+        document.getElementById('passwordError').classList.add('show');
+        passwordInput.classList.add('error');
+        passwordInput.setAttribute('aria-invalid', 'true');
+        isValid = false;
+      } else {
+        document.getElementById('passwordError').classList.remove('show');
+        passwordInput.classList.remove('error');
+        passwordInput.setAttribute('aria-invalid', 'false');
+      }
+
+      return isValid;
+    }
+
+    /**
+     * Show loading state on the submit button.
+     * WHY? Visual feedback that the form is being processed.
+     * Prevents double-submission while request is in flight.
+     */
+    function showLoading() {
+      loginBtn.classList.add('loading');
+      loginBtn.disabled = true;
+    }
+
+    /**
+     * Hide loading state and re-enable button.
+     */
+    function hideLoading() {
+      loginBtn.classList.remove('loading');
+      loginBtn.disabled = false;
+    }
+
+    /**
+     * Show global error message.
+     * @param {string} message - Error message to display
+     */
+    function showGlobalError(message) {
+      globalErrorText.textContent = message;
+      globalError.classList.add('show');
+    }
+
+    /**
+     * Hide global error message.
+     */
+    function hideGlobalError() {
+      globalError.classList.remove('show');
+    }
+
+    /**
+     * Handle form submission.
+     * This is the main authentication handler.
+     */
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault(); // Prevent default form submission (page reload)
+      
+      hideGlobalError();
+
+      if (!validateForm()) {
+        return; // Stop if validation fails
+      }
+
+      showLoading();
+
+      try {
+        // 
+        // API Call: POST /auth/login
+        // In a real app, this would be:
+        // const response = await api.post('/auth/login', { email, password });
+        //
+        // For demo purposes, we simulate an API call with a delay
+        //
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Simulate successful login
+        // In production: store JWT token in localStorage or httpOnly cookie
+        // localStorage.setItem('token', response.data.token);
+        
+        // Redirect to dashboard
+        // window.location.href = '/dashboard.html';
+        alert('¡Inicio de sesión exitoso! Redirigiendo al dashboard...');
+        
+      } catch (error) {
+        // Handle different error types
+        showGlobalError(
+          error.message || 'Error al conectar con el servidor. Intenta de nuevo.'
+        );
+      } finally {
+        hideLoading();
+      }
+    });
+
+    /**
+     * Handle forgot password link.
+     * In production, this would redirect to a password reset page.
+     */
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      // Redirect to forgot password page
+      // window.location.href = '/forgot-password.html';
+      alert('Funcionalidad de recuperación de contraseña');
+    }
+
+    // Clear error when user starts typing
+    emailInput.addEventListener('input', function() {
+      if (this.classList.contains('error')) {
+        document.getElementById('emailError').classList.remove('show');
+        this.classList.remove('error');
+        this.setAttribute('aria-invalid', 'false');
+      }
+    });
+
+    passwordInput.addEventListener('input', function() {
+      if (this.classList.contains('error')) {
+        document.getElementById('passwordError').classList.remove('show');
+        this.classList.remove('error');
+        this.setAttribute('aria-invalid', 'false');
+      }
+    });
+  </script>
+</body>
+</html>

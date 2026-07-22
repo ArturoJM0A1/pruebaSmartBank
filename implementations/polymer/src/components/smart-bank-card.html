@@ -1,0 +1,187 @@
+<!--
+  Smart Bank Card - Polymer Component
+  
+  POLYMER vs LITELEMENT:
+  - Polymer (legacy): Google's Web Components library (2013-2019)
+  - LitElement (modern): Lightweight successor to Polymer (2019+)
+  - WHY was Polymer created?
+    → Web Components standard was immature
+    → Polymer added convenience features on top
+    → Template binding, data binding, lifecycle hooks
+  - WHY LitElement replaced it?
+    → Smaller bundle (~5kb vs ~30kb)
+    → Better performance
+    → Closer to native Web Components
+    → No more development (Polymer 3 is final)
+  
+  TEMPLATE BINDING in Polymer:
+  - [[expression]]: One-way data binding (output)
+  - {{expression}}: Two-way data binding (input/output)
+  - on-click="_handler": Event binding
+  - if="[[condition]]": Conditional rendering
+  - dom-repeat: List rendering
+  
+  LEGACY vs MODERN:
+  - Polymer uses HTML imports (deprecated standard)
+  - Lit uses ES modules (modern standard)
+  - Polymer depends on @polymer library
+  - LitElement depends on 'lit' (tiny, ~5kb)
+  - Migration: Polymer → Lit is straightforward
+-->
+<dom-module id="smart-bank-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+                    0 1px 2px rgba(0, 0, 0, 0.24);
+        padding: 24px;
+        transition: all 0.2s ease-in-out;
+        border: 2px solid transparent;
+      }
+
+      .card:hover {
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                    0 3px 6px rgba(0, 0, 0, 0.23);
+        transform: translateY(-2px);
+      }
+
+      .card.highlighted {
+        border-color: #1a73e8;
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: #202124;
+      }
+
+      .card-subtitle {
+        font-size: 14px;
+        color: #5f6368;
+        margin: 0 0 16px 0;
+        text-transform: uppercase;
+      }
+
+      .card-balance {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a73e8;
+        margin: 0;
+      }
+
+      .card-footer {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #dadce0;
+      }
+    </style>
+
+    <!--
+      WHY [[expression]] (one-way) vs {{expression}} (two-way)?
+      - [[expression]]: Parent to child only (safer, faster)
+      - {{expression}}: Bidirectional (can cause circular updates)
+      - Use one-way by default, two-way only when needed
+      - Polymer 3 recommends one-way data flow (like React)
+    -->
+    <div class$="[[highlightedClass]]">
+      <h3 class="card-title">[[title]]</h3>
+      <p class="card-subtitle">[[subtitle]]p>
+      <p class="card-balance">[[formattedBalance]]</p>
+      
+      <!-- Content projection (like <slot> in Lit) -->
+      <div class="card-footer">
+        <slot></slot>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    /**
+     * Polymer class-based component
+     * 
+     * WHY extends Polymer.Element instead of HTMLElement?
+     * - Polymer.Element adds data binding, template, lifecycle
+     * - Custom elements only give you the raw Web Component API
+     * - Polymer adds the convenience features on top
+     * 
+     * PROPERTIES in Polymer:
+     * - defined in static get properties()
+     * - Support: type, value, observer, computed, reflectToAttribute
+     * - Automatically create attribute bindings
+     */
+    class SmartBankCard extends Polymer.Element {
+      static get is() { return 'smart-bank-card'; }
+
+      static get properties() {
+        return {
+          title: {
+            type: String,
+            value: '',
+          },
+          subtitle: {
+            type: String,
+            value: '',
+          },
+          balance: {
+            type: Number,
+            value: 0,
+          },
+          currency: {
+            type: String,
+            value: 'USD',
+          },
+          highlighted: {
+            type: Boolean,
+            value: false,
+          },
+          // WHY computed property?
+          // Automatically recalculates when dependencies change
+          // Polymer handles dependency tracking
+          formattedBalance: {
+            type: String,
+            computed: '_formatBalance(balance, currency)',
+          },
+          highlightedClass: {
+            type: String,
+            computed: '_getHighlightedClass(highlighted)',
+          },
+        };
+      }
+
+      // Computed property function
+      // WHY separate function? Better testability
+      _formatBalance(balance, currency) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: currency,
+        }).format(balance);
+      }
+
+      _getHighlightedClass(highlighted) {
+        return highlighted ? 'card highlighted' : 'card';
+      }
+
+      // Lifecycle: When element is ready
+      // WHY connectedCallback equivalent?
+      // Polymer's ready() is called after element is fully initialized
+      ready() {
+        super.ready();
+        // Element is now ready for interaction
+      }
+    }
+
+    // Register custom element
+    // WHY window.customElements.define?
+    // Standard Web Component registration
+    // Polymer uses this same API
+    window.customElements.define(SmartBankCard.is, SmartBankCard);
+  </script>
+</dom-module>

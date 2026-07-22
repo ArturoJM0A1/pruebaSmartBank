@@ -1,0 +1,138 @@
+<!--
+  Smart Bank Input - Polymer Component
+  
+  IRON INPUT / PAPER INPUT patterns:
+  - @polymer/iron-input: Basic input with validation
+  - @polymer/paper-input: Material Design styled input
+  - This example: Custom input using Polymer patterns
+  
+  TWO-WAY BINDING in Polymer:
+  - {{value}} creates bidirectional binding
+  - Parent can set value, input changes update parent
+  - Automatic synchronization
+  - Similar to Vue's v-model
+-->
+<dom-module id="smart-bank-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #202124;
+      }
+
+      .required {
+        color: #ea4335;
+        margin-left: 2px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+      }
+
+      input.error {
+        border-color: #ea4335;
+      }
+
+      input:disabled {
+        background: #f8f9fa;
+        cursor: not-allowed;
+      }
+
+      .error-message {
+        display: block;
+        color: #ea4335;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+    </style>
+
+    <label for$="input-[[_uid]]">
+      [[label]]
+      <span class="required" hidden$="[[!required]]">*</span>
+    </label>
+    <input
+      id$="input-[[_uid]]"
+      type$="[[type]]"
+      value="{{value::input}}"
+      placeholder$="[[placeholder]]"
+      disabled$="[[disabled]]"
+      required$="[[required]]"
+      class$="[[errorClass]]"
+      on-blur="_handleBlur"
+    />
+    <span
+      class="error-message"
+      hidden$="[[!error]]"
+      role="alert"
+    >[[error]]</span>
+  </template>
+
+  <script>
+    class SmartBankInput extends Polymer.Element {
+      static get is() { return 'smart-bank-input'; }
+
+      static get properties() {
+        return {
+          label: { type: String, value: '' },
+          type: { type: String, value: 'text' },
+          placeholder: { type: String, value: '' },
+          value: {
+            type: String,
+            value: '',
+            // WHY notify: true?
+            // Allows parent to receive value changes
+            // Required for two-way binding from parent
+            notify: true,
+          },
+          disabled: { type: Boolean, value: false },
+          required: { type: Boolean, value: false },
+          error: { type: String, value: '' },
+          errorClass: {
+            type: String,
+            computed: '_getErrorClass(error)',
+          },
+          _uid: {
+            type: Number,
+            value: function() {
+              return Math.random().toString(36).substr(2, 9);
+            },
+          },
+        };
+      }
+
+      _getErrorClass(error) {
+        return error ? 'error' : '';
+      }
+
+      _handleBlur() {
+        if (this.required && !this.value) {
+          this.error = this.label + ' is required';
+        }
+
+        this.fire('input-blur', { value: this.value });
+      }
+    }
+
+    window.customElements.define(SmartBankInput.is, SmartBankInput);
+  </script>
+</dom-module>

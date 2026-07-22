@@ -1,0 +1,271 @@
+# ============================================================================
+# SMARTBANK - CI PIPELINE (Continuous Integration)
+# ============================================================================
+#
+# WHAT IS CI?
+#   Continuous Integration automatically runs checks when code is pushed.
+#   Every push triggers: install → lint → test → build
+#   This catches bugs BEFORE they reach production.
+#
+# WHY CI?
+#   - Prevents "works on my machine" problems
+#   - Enforces code quality standards automatically
+#   - Catches broken tests before merge
+#   - Builds confidence in every deployment
+#
+# GITHUB ACTIONS SYNTAX:
+#   - on: When to run (push, PR, schedule)
+#   - jobs: What to run (parallel or sequential)
+#   - steps: Individual tasks within a job
+#   - uses: Pre-built actions from GitHub Marketplace
+#   - run: Shell commands to execute
+#   - env: Environment variables
+#
+# ============================================================================
+
+name: SmartBank CI
+
+# ============================================================================
+# TRIGGERS: When this pipeline runs
+# ============================================================================
+# WHY these triggers?
+#   - push to develop: Feature integration
+#   - push to main: Production deployment candidate
+#   - pull_request: Validate PRs before merge
+#   - workflow_dispatch: Manual trigger for debugging
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch: # Allow manual trigger
+
+# ============================================================================
+# JOBS: What the pipeline does
+# ============================================================================
+
+jobs:
+  # ==========================================================================
+  # JOB 1: Install Dependencies
+  # ==========================================================================
+  # WHY separate job?
+  #   - Other jobs can reuse the cached node_modules
+  #   - Fails fast if package.json has issues
+  #   - Clear visibility of install step
+
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest # Latest Ubuntu LTS
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # WHY: Pipeline needs the code to work with
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # Cache npm dependencies
+          # WHY cache: Saves 2-5 minutes on each run
+
+      - name: Install dependencies
+        run: npm ci
+        # WHY ci not install: npm ci is faster, deterministic, fails on lockfile issues
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+          # WHY: Reuse cached deps in other jobs
+
+  # ==========================================================================
+  # JOB 2: Lint Code
+  # ==========================================================================
+  # WHY lint in CI?
+  #   - Enforces consistent code style across team
+  #   - Catches syntax errors before runtime
+  #   - Prevents common mistakes (unused vars, console.log, etc.)
+
+  lint:
+    name: Lint Code
+    needs: install # Wait for install to complete
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run ESLint
+        run: npm run lint
+        # ESLint checks: syntax, style, potential bugs
+
+  # ==========================================================================
+  # JOB 3: Run Tests
+  # ==========================================================================
+  # WHY test in CI?
+  #   - Prevents regressions (bugs coming back)
+  #   - Ensures new code doesn't break existing features
+  #   - Coverage reports show what's tested
+
+  test:
+    name: Run Tests
+    needs: install
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+        # WHY matrix: Test on multiple Node versions
+        # Ensures compatibility across versions
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage --forceExit
+        # WHY forceExit: Prevent hanging tests from blocking CI
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always() # Upload even if tests fail
+        with:
+          name: coverage-report-node${{ matrix.node-version }}
+          path: coverage/
+          # WHY: Coverage reports are useful for review
+
+  # ==========================================================================
+  # JOB 4: Build Project
+  # ==========================================================================
+  # WHY build in CI?
+  #   - Verifies production build works
+  #   - Catches build errors early
+  #   - Produces deployable artifacts
+
+  build:
+    name: Build Project
+    needs: [lint, test] # Only build if lint AND tests pass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+          # WHY: Build artifacts are used by CD pipeline
+
+  # ==========================================================================
+  # JOB 5: SonarCloud Analysis
+  # ==========================================================================
+  # WHAT: Code quality analysis (bugs, vulnerabilities, code smells)
+  # WHY: SonarCloud finds issues that linters miss
+  # NOTE: Requires SONAR_TOKEN in repository secrets
+
+  sonar:
+    name: SonarCloud Analysis
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' # Only on push
+    # WHY: SonarCloud PR analysis works differently
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # WHAT: Analyzes code for quality issues
+        # Findings appear on sonarcloud.io dashboard
+
+  # ==========================================================================
+  # JOB 6: Security Scan
+  # ==========================================================================
+
+  security:
+    name: Security Audit
+    needs: install
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        # WHY: Checks for known vulnerabilities in dependencies
+        # Fails if high/critical vulnerabilities found

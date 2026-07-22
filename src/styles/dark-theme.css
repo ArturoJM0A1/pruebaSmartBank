@@ -1,0 +1,355 @@
+/* ==========================================================================
+   SmartBank Dark Theme
+   
+   WHY dark mode?
+   - Reduces eye strain in low-light environments
+   - Saves battery on OLED screens
+   - Many users prefer dark interfaces
+   - Accessibility requirement for some users
+   
+   Implementation strategy:
+   We override CSS custom properties (variables) from variables.css.
+   Since all components reference these variables, changing them
+   automatically updates the entire UI.
+   
+   Approach: Class-based (html.dark-theme) vs System preference
+   We support BOTH:
+   1. html.dark-theme: Manual toggle by user
+   2. @media (prefers-color-scheme: dark): Automatic based on system
+   
+   The class-based approach takes priority (via specificity).
+   ========================================================================== */
+
+/* ========================================================================
+   DARK THEME VARIABLES
+   
+   Override the default light theme values.
+   Dark backgrounds reduce eye strain, light text ensures readability.
+   
+   Key principles for dark themes:
+   - Dark backgrounds (not pure black - reduce contrast)
+   - Slightly desaturated colors (pure colors vibrate on dark bg)
+   - Elevated surfaces get lighter (material design depth)
+   - Shadows become darker/stronger (more visible on dark)
+   - Text uses lighter grays (not pure white - reduces glare)
+   ======================================================================== */
+html.dark-theme {
+  /* Primary colors - desaturated for dark mode comfort */
+  --color-primary-50: #1e3a5f;
+  --color-primary-100: #1e3a5f;
+  --color-primary-200: #2563eb;
+  --color-primary-300: #3b82f6;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #60a5fa;
+  --color-primary-600: #3b82f6;
+  --color-primary-700: #2563eb;
+  --color-primary-800: #1d4ed8;
+  --color-primary-900: #1e40af;
+
+  /* Status colors - adjusted for dark backgrounds */
+  --color-success-50: #14532d;
+  --color-success-100: #14532d;
+  --color-success-500: #4ade80;
+  --color-success-600: #22c55e;
+  --color-success-700: #16a34a;
+
+  --color-warning-50: #78350f;
+  --color-warning-100: #78350f;
+  --color-warning-500: #fbbf24;
+  --color-warning-600: #f59e0b;
+  --color-warning-700: #d97706;
+
+  --color-danger-50: #7f1d1d;
+  --color-danger-100: #7f1d1d;
+  --color-danger-500: #f87171;
+  --color-danger-600: #ef4444;
+  --color-danger-700: #dc2626;
+
+  --color-info-50: #1e3a5f;
+  --color-info-100: #1e3a5f;
+  --color-info-500: #38bdf8;
+  --color-info-600: #0ea5e9;
+  --color-info-700: #0284c7;
+
+  /* Neutral colors - darker grays for dark mode */
+  --color-gray-0: #1a1a2e;      /* Darkest - page background */
+  --color-gray-50: #16213e;     /* Card background */
+  --color-gray-100: #1f2b47;    /* Elevated surface */
+  --color-gray-200: #2a3a5c;    /* Borders */
+  --color-gray-300: #3b4f7a;    /* Disabled borders */
+  --color-gray-400: #5a6f9a;    /* Placeholder text */
+  --color-gray-500: #8494b7;    /* Secondary text */
+  --color-gray-600: #a0b0cc;    /* Body text */
+  --color-gray-700: #c8d4e8;    /* Headings */
+  --color-gray-800: #e2e8f0;    /* Bright text */
+  --color-gray-900: #f1f5f9;    /* Brightest text */
+
+  /* Dark mode shadows - more prominent for depth */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+/* ========================================================================
+   SYSTEM PREFERENCE DARK MODE
+   
+   Automatically apply dark mode when user's OS is set to dark.
+   This uses the prefers-color-scheme media query.
+   
+   NOTE: This is the LESS SPECIFIC selector. If the user has
+   manually toggled dark mode (class-based), it should take priority.
+   We use !important sparingly here, or adjust specificity.
+   ======================================================================== */
+@media (prefers-color-scheme: dark) {
+  html:not(.light-theme) {
+    /* Apply same dark variables as above */
+    --color-primary-50: #1e3a5f;
+    --color-primary-100: #1e3a5f;
+    --color-primary-200: #2563eb;
+    --color-primary-300: #3b82f6;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #60a5fa;
+    --color-primary-600: #3b82f6;
+    --color-primary-700: #2563eb;
+    --color-primary-800: #1d4ed8;
+    --color-primary-900: #1e40af;
+
+    --color-success-50: #14532d;
+    --color-success-100: #14532d;
+    --color-success-500: #4ade80;
+    --color-success-600: #22c55e;
+    --color-success-700: #16a34a;
+
+    --color-warning-50: #78350f;
+    --color-warning-100: #78350f;
+    --color-warning-500: #fbbf24;
+    --color-warning-600: #f59e0b;
+    --color-warning-700: #d97706;
+
+    --color-danger-50: #7f1d1d;
+    --color-danger-100: #7f1d1d;
+    --color-danger-500: #f87171;
+    --color-danger-600: #ef4444;
+    --color-danger-700: #dc2626;
+
+    --color-info-50: #1e3a5f;
+    --color-info-100: #1e3a5f;
+    --color-info-500: #38bdf8;
+    --color-info-600: #0ea5e9;
+    --color-info-700: #0284c7;
+
+    --color-gray-0: #1a1a2e;
+    --color-gray-50: #16213e;
+    --color-gray-100: #1f2b47;
+    --color-gray-200: #2a3a5c;
+    --color-gray-300: #3b4f7a;
+    --color-gray-400: #5a6f9a;
+    --color-gray-500: #8494b7;
+    --color-gray-600: #a0b0cc;
+    --color-gray-700: #c8d4e8;
+    --color-gray-800: #e2e8f0;
+    --color-gray-900: #f1f5f9;
+
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* ========================================================================
+   DARK MODE COMPONENT OVERRIDES
+   
+   Some components need explicit dark mode adjustments beyond
+   just changing variables. These rules handle those cases.
+   ======================================================================== */
+
+/* Body background */
+html.dark-theme body {
+  background-color: var(--color-gray-0);
+  color: var(--color-gray-800);
+}
+
+/* Cards in dark mode */
+html.dark-theme .card {
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-200);
+}
+
+html.dark-theme .card-header {
+  border-bottom-color: var(--color-gray-200);
+}
+
+html.dark-theme .card-footer {
+  background-color: var(--color-gray-100);
+  border-top-color: var(--color-gray-200);
+}
+
+/* Header */
+html.dark-theme .app-header {
+  background-color: var(--color-gray-50);
+  border-bottom-color: var(--color-gray-200);
+}
+
+/* Sidebar */
+html.dark-theme .app-sidebar {
+  background-color: var(--color-gray-0);
+  border-right-color: var(--color-gray-200);
+}
+
+/* Form inputs */
+html.dark-theme .form-input,
+html.dark-theme .form-select,
+html.dark-theme .form-textarea {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-300);
+  color: var(--color-gray-800);
+}
+
+html.dark-theme .form-input:focus,
+html.dark-theme .form-select:focus,
+html.dark-theme .form-textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+/* Table */
+html.dark-theme .table th {
+  background-color: var(--color-gray-100);
+  border-bottom-color: var(--color-gray-200);
+}
+
+html.dark-theme .table td {
+  border-bottom-color: var(--color-gray-200);
+}
+
+html.dark-theme .table tbody tr:hover {
+  background-color: var(--color-gray-100);
+}
+
+/* Modal */
+html.dark-theme .modal {
+  background-color: var(--color-gray-50);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+html.dark-theme .modal-header {
+  border-bottom-color: var(--color-gray-200);
+}
+
+html.dark-theme .modal-footer {
+  border-top-color: var(--color-gray-200);
+  background-color: var(--color-gray-100);
+}
+
+/* Toast */
+html.dark-theme .toast {
+  background-color: var(--color-gray-50);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+}
+
+/* Dropdown */
+html.dark-theme .dropdown-menu {
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-200);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+}
+
+html.dark-theme .dropdown-item {
+  color: var(--color-gray-700);
+}
+
+html.dark-theme .dropdown-item:hover {
+  background-color: var(--color-gray-100);
+}
+
+/* Pagination */
+html.dark-theme .pagination-btn {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-300);
+  color: var(--color-gray-600);
+}
+
+html.dark-theme .pagination-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-200);
+}
+
+/* Checkbox and radio marks */
+html.dark-theme .form-checkbox-mark,
+html.dark-theme .form-radio-mark {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-300);
+}
+
+/* Skeleton loading */
+html.dark-theme .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-100) 25%,
+    var(--color-gray-200) 50%,
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Code blocks */
+html.dark-theme code {
+  background-color: var(--color-gray-100);
+  color: var(--color-danger-500);
+}
+
+html.dark-theme pre {
+  background-color: var(--color-gray-100);
+}
+
+/* Scrollbar styling for dark mode */
+html.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark-theme ::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+}
+
+html.dark-theme ::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+html.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* ========================================================================
+   DARK MODE TRANSITION
+   
+   Smooth transition when toggling between light and dark mode.
+   This creates a pleasant visual effect during the switch.
+   ======================================================================== */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark-theme,
+html:not(.dark-theme) {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply transition to major elements during theme switch */
+html.dark-theme .app-header,
+html.dark-theme .app-sidebar,
+html.dark-theme .card,
+html.dark-theme .modal,
+html.dark-theme .toast,
+html.dark-theme .dropdown-menu,
+html.dark-theme .form-input,
+html.dark-theme .form-select,
+html.dark-theme .form-textarea {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}

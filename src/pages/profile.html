@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /*
+      Profile Page:
+      User data management with privacy considerations.
+      WHY this layout? Profile pages combine read-only and editable fields.
+      Sensitive data (RFC, CURP) requires extra protection.
+    */
+    .page-title { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800);margin-bottom:var(--spacing-6); }
+
+    /* Profile header */
+    .profile-header {
+      background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-8);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-6);
+      margin-bottom: var(--spacing-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-header::after {
+      content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.08);
+    }
+
+    .profile-avatar-wrap {
+      position:relative;z-index:1;
+    }
+
+    .profile-avatar {
+      width:96px;height:96px;border-radius:50%;
+      background:rgba(255,255,255,0.2);
+      display:flex;align-items:center;justify-content:center;
+      font-size:var(--font-size-4xl);font-weight:var(--font-weight-bold);
+      border:3px solid rgba(255,255,255,0.3);
+    }
+
+    .avatar-upload-btn {
+      position:absolute;bottom:0;right:0;
+      width:32px;height:32px;border-radius:50%;
+      background:white;color:var(--color-primary-600);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;border:2px solid var(--color-primary-100);
+      transition:background var(--transition-fast);
+    }
+    .avatar-upload-btn:hover { background:var(--color-gray-100); }
+
+    .profile-info { position:relative;z-index:1;flex:1; }
+    .profile-name { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);margin-bottom:var(--spacing-1); }
+    .profile-email { font-size:var(--font-size-base);opacity:0.8;margin-bottom:var(--spacing-3); }
+    .profile-badges { display:flex;gap:var(--spacing-2);flex-wrap:wrap; }
+
+    .badge { display:inline-flex;align-items:center;padding:var(--spacing-1) var(--spacing-3);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);border-radius:var(--radius-full);background:rgba(255,255,255,0.2);color:white; }
+
+    /* Profile sections */
+    .profile-grid {
+      display:grid;grid-template-columns:1fr;gap:var(--spacing-6);
+    }
+
+    @media (min-width: 768px) { .profile-grid { grid-template-columns:1fr 1fr; } }
+
+    .profile-card {
+      background:var(--color-gray-0);border:1px solid var(--color-gray-200);
+      border-radius:var(--radius-xl);overflow:hidden;
+    }
+
+    .profile-card-header {
+      padding:var(--spacing-5) var(--spacing-6);
+      border-bottom:1px solid var(--color-gray-100);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+
+    .profile-card-title { font-size:var(--font-size-base);font-weight:var(--font-weight-semibold);color:var(--color-gray-800); }
+
+    .profile-field {
+      display:flex;justify-content:space-between;align-items:center;
+      padding:var(--spacing-3) var(--spacing-6);
+      border-bottom:1px solid var(--color-gray-50);
+    }
+    .profile-field:last-child { border-bottom:none; }
+
+    .field-label { font-size:var(--font-size-xs);color:var(--color-gray-400);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--spacing-1); }
+    .field-value { font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-800); }
+    .field-value.masked { font-family:var(--font-family-mono);letter-spacing:0.1em; }
+
+    .btn-primary { background:var(--color-primary-600);color:white;border:none;height:36px;padding:0 var(--spacing-3);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-xs);transition:background var(--transition-fast); }
+    .btn-primary:hover { background:var(--color-primary-700); }
+    .btn-ghost { background:transparent;color:var(--color-gray-600);border:1px solid var(--color-gray-300);height:36px;padding:0 var(--spacing-3);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-xs); }
+    .btn-ghost:hover { background:var(--color-gray-50); }
+    .btn-danger { background:var(--color-danger-600);color:white;border:none;height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm); }
+
+    /* Account status */
+    .status-badge { display:inline-flex;align-items:center;gap:var(--spacing-1);padding:var(--spacing-1) var(--spacing-2);border-radius:var(--radius-full);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium); }
+    .status-badge.active { background:var(--color-success-100);color:var(--color-success-700); }
+    .status-badge-dot { width:6px;height:6px;border-radius:50%;background:currentColor; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Mi Perfil</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <h1 class="page-title">Mi Perfil</h1>
+
+      <!-- Profile header -->
+      <div class="profile-header">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">JP</div>
+          <label class="avatar-upload-btn" title="Cambiar foto" tabindex="0" role="button" aria-label="Cambiar foto de perfil">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <input type="file" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+          </label>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">Juan Pérez López</div>
+          <div class="profile-email">juan.perez@email.com</div>
+          <div class="profile-badges">
+            <span class="badge">Miembro desde 2023</span>
+            <span class="badge">Verificado ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile details grid -->
+      <div class="profile-grid">
+        <!-- Personal data -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <div class="profile-card-title">Datos personales</div>
+            <button class="btn-ghost" onclick="showToast('Edición','Campos de edición en desarrollo','info')">Editar</button>
+          </div>
+          <div class="profile-field"><div><div class="field-label">Nombre completo</div><div class="field-value">Juan Pérez López</div></div></div>
+          <div class="profile-field"><div><div class="field-label">Fecha de nacimiento</div><div class="field-value">15 Mar 1990</div></div></div>
+          <div class="profile-field"><div><div class="field-label">RFC</div><div class="field-value masked">PEPJ900315ABC</div></div><button class="btn-ghost" onclick="this.previousElementSibling.querySelector('.field-value').classList.toggle('masked')">Ver</button></div>
+          <div class="profile-field"><div><div class="field-label">CURP</div><div class="field-value masked">PEPJ900315HDFRRS09</div></div><button class="btn-ghost" onclick="this.previousElementSibling.querySelector('.field-value').classList.toggle('masked')">Ver</button></div>
+        </div>
+
+        <!-- Contact information -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <div class="profile-card-title">Información de contacto</div>
+            <button class="btn-ghost" onclick="showToast('Edición','Campos de edición en desarrollo','info')">Editar</button>
+          </div>
+          <div class="profile-field"><div><div class="field-label">Correo electrónico</div><div class="field-value">juan.perez@email.com</div></div></div>
+          <div class="profile-field"><div><div class="field-label">Teléfono</div><div class="field-value">+52 555 123 4567</div></div></div>
+          <div class="profile-field"><div><div class="field-label">Dirección</div><div class="field-value">Av. Reforma 123, Col. Centro, CDMX</div></div></div>
+        </div>
+
+        <!-- Account status -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <div class="profile-card-title">Estado de cuenta</div>
+          </div>
+          <div class="profile-field"><div><div class="field-label">Estado</div><div class="field-value"><span class="status-badge active"><span class="status-badge-dot"></span> Activa</span></div></div></div>
+          <div class="profile-field"><div><div class="field-label">Tipo de cuenta</div><div class="field-value">Personal</div></div></div>
+          <div class="profile-field"><div><div class="field-label">Nivel</div><div class="field-value">Platinum</div></div></div>
+          <div class="profile-field"><div><div class="field-label">Registro desde</div><div class="field-value">15 Ene 2023</div></div></div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="profile-card" style="border-color:var(--color-danger-200);">
+          <div class="profile-card-header" style="background:var(--color-danger-50);">
+            <div class="profile-card-title" style="color:var(--color-danger-700);">Zona de peligro</div>
+          </div>
+          <div class="profile-field" style="padding:var(--spacing-5) var(--spacing-6);">
+            <div style="flex:1;">
+              <div class="field-label" style="color:var(--color-danger-600);">Cerrar sesión</div>
+              <div class="field-value" style="font-size:var(--font-size-xs);color:var(--color-gray-500);">Cierra tu sesión actual en todos los dispositivos</div>
+            </div>
+            <button class="btn-danger" onclick="handleLogout()">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    function handleAvatarUpload(input) {
+      if (input.files && input.files[0]) {
+        showToast('Foto', 'Foto de perfil actualizada', 'success');
+      }
+    }
+
+    function handleLogout() {
+      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        showToast('Sesión', 'Cerrando sesión...', 'info');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      }
+    }
+
+    function showToast(title, message, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+  </script>
+</body>
+</html>

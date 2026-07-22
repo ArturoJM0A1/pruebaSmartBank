@@ -1,0 +1,462 @@
+/* ==========================================================================
+   SmartBank Responsive Design
+   
+   WHY mobile-first?
+   1. Performance: Mobile devices have less processing power
+      Loading only mobile styles initially = faster load
+   2. Progressive enhancement: Add complexity only when needed
+   3. Forces focus on core content (what matters most on mobile?)
+   4. Better Google rankings (mobile-first indexing)
+   5. More users browse on mobile than desktop (60%+ globally)
+   
+   Responsive vs Adaptive:
+   - Responsive: Fluid layouts that adjust continuously (CSS media queries)
+   - Adaptive: Fixed layouts that switch at breakpoints (server-side)
+   
+   We use RESPONSIVE design with CSS media queries.
+   
+   Mobile-first approach:
+   1. Write base styles for mobile (< 640px)
+   2. Add @media (min-width: 640px) for tablets
+   3. Add @media (min-width: 1024px) for desktops
+   4. Add @media (min-width: 1280px) for large screens
+   ========================================================================== */
+
+/* ========================================================================
+   MOBILE STYLES (Base - No media query needed)
+   
+   These styles apply to ALL screen sizes.
+   They represent the mobile experience.
+   ======================================================================== */
+
+/* App layout adjustments for mobile */
+@media (max-width: 768px) {
+  /* On mobile, sidebar becomes a slide-over panel */
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal);
+    z-index: var(--z-modal);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Header adjustments */
+  .app-header {
+    padding: 0 var(--spacing-4);
+  }
+
+  /* Main content fills available space */
+  .app-main {
+    padding: var(--spacing-4);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  /* Stack grid layouts on mobile */
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Make cards full width */
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Section headers stack vertically */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+  }
+
+  /* Tables scroll horizontally */
+  .table-container {
+    margin-left: calc(-1 * var(--spacing-4));
+    margin-right: calc(-1 * var(--spacing-4));
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  /* Modals go fullscreen on mobile */
+  .modal {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    top: 0;
+    left: 0;
+    transform: translateY(100%);
+  }
+
+  .modal.active {
+    transform: translateY(0);
+  }
+
+  /* Toasts full width on mobile */
+  .toast-container {
+    left: var(--spacing-4);
+    right: var(--spacing-4);
+    bottom: var(--spacing-4);
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: 100%;
+  }
+
+  /* Hide elements on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* Pagination adjustments */
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Buttons stack on mobile */
+  .btn-group-responsive {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group-responsive .btn {
+    width: 100%;
+  }
+}
+
+/* ========================================================================
+   TABLET STYLES (768px and up)
+   
+   Tablets have more screen real estate than phones.
+   We can start introducing multi-column layouts.
+   ======================================================================== */
+@media (min-width: var(--breakpoint-md)) {
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+  }
+
+  /* Two-column layouts start working */
+  .grid-cols-tablet-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-cols-tablet-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Show tablet-hidden elements */
+  .show-tablet {
+    display: block;
+  }
+
+  .hide-tablet {
+    display: none !important;
+  }
+
+  /* Modal can be smaller on tablets */
+  .modal {
+    max-width: 500px;
+  }
+
+  /* Toasts back to fixed width */
+  .toast-container {
+    left: auto;
+    right: var(--spacing-6);
+    bottom: var(--spacing-6);
+  }
+}
+
+/* ========================================================================
+   DESKTOP STYLES (1024px and up)
+   
+   Full desktop experience with sidebar and multi-column layouts.
+   ======================================================================== */
+@media (min-width: var(--breakpoint-lg)) {
+  /* Show sidebar on desktop */
+  .app-layout {
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-areas:
+      "sidebar header"
+      "sidebar main";
+  }
+
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transform: translateX(0);
+  }
+
+  /* Three and four column grids */
+  .grid-cols-desktop-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-cols-desktop-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Show desktop-only elements */
+  .show-desktop {
+    display: block;
+  }
+
+  .hide-desktop {
+    display: none !important;
+  }
+
+  /* Modal sizes */
+  .modal-lg {
+    max-width: 600px;
+  }
+}
+
+/* ========================================================================
+   LARGE SCREEN STYLES (1280px and up)
+   
+   Extra-wide screens get additional content density.
+   ======================================================================== */
+@media (min-width: var(--breakpoint-xl)) {
+  /* More spacious layouts */
+  .app-main {
+    padding: var(--spacing-8);
+  }
+
+  /* Four column grids */
+  .grid-cols-xl-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .grid-cols-xl-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ========================================================================
+   EXTRA LARGE SCREENS (1536px and up)
+   
+   For very large displays, constrain max-width to prevent
+   overly stretched content (especially text).
+   ======================================================================== */
+@media (min-width: var(--breakpoint-2xl)) {
+  .container {
+    max-width: 1400px;
+  }
+
+  .app-main {
+    max-width: 1400px;
+  }
+}
+
+/* ========================================================================
+   RESPONSIVE UTILITIES
+   
+   Show/hide elements at specific breakpoints.
+   Use these classes to control element visibility.
+   
+   Convention:
+   - hide-{breakpoint}: hides at that breakpoint and below
+   - show-{breakpoint}: shows only at that breakpoint and above
+   ======================================================================== */
+.hide-mobile { display: block; }
+.hide-tablet { display: block; }
+.hide-desktop { display: block; }
+
+.show-mobile { display: none; }
+.show-tablet { display: none; }
+.show-desktop { display: none; }
+
+/* Override visibility at breakpoints */
+@media (max-width: 767px) {
+  .show-mobile { display: block; }
+  .show-mobile-flex { display: flex; }
+}
+
+@media (min-width: 768px) {
+  .show-tablet { display: block; }
+  .show-tablet-flex { display: flex; }
+}
+
+@media (min-width: 1024px) {
+  .show-desktop { display: block; }
+  .show-desktop-flex { display: flex; }
+}
+
+/* Flex visibility */
+.show-mobile-flex { display: none; }
+.show-tablet-flex { display: none; }
+.show-desktop-flex { display: none; }
+
+@media (max-width: 767px) {
+  .show-mobile-flex { display: flex; }
+}
+
+@media (min-width: 768px) {
+  .show-tablet-flex { display: flex; }
+}
+
+@media (min-width: 1024px) {
+  .show-desktop-flex { display: flex; }
+}
+
+/* ========================================================================
+   RESPONSIVE TYPOGRAPHY
+   
+   Scale down font sizes on smaller screens for better readability.
+   Large headings that look great on desktop can be overwhelming on mobile.
+   ======================================================================== */
+@media (max-width: 767px) {
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+
+  h4 {
+    font-size: var(--font-size-lg);
+  }
+
+  /* Reduce padding on smaller screens */
+  .p-responsive {
+    padding: var(--spacing-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .p-responsive {
+    padding: var(--spacing-6);
+  }
+}
+
+/* ========================================================================
+   CONTAINER QUERIES (Progressive Enhancement)
+   
+   Container queries are the future of responsive design.
+   Instead of responding to viewport size, they respond to
+   the PARENT container's size.
+   
+   Browser support: Chrome 105+, Firefox 110+, Safari 16+
+   We use @supports to only apply when container queries are supported.
+   ======================================================================== */
+@supports (container-type: inline-size) {
+  .card-container {
+    container-type: inline-size;
+  }
+
+  @container (min-width: 400px) {
+    .card-responsive {
+      flex-direction: row;
+    }
+  }
+}
+
+/* ========================================================================
+   PRINT STYLES
+   
+   Banking apps often need to print statements and receipts.
+   Print styles ensure documents look professional on paper.
+   ======================================================================== */
+@media print {
+  /* Hide navigation and interactive elements */
+  .app-sidebar,
+  .app-header,
+  .btn,
+  .toast-container,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  /* Show main content at full width */
+  .app-layout {
+    display: block;
+  }
+
+  .app-main {
+    padding: 0;
+  }
+
+  /* Ensure colors print correctly */
+  body {
+    background: white;
+    color: black;
+  }
+
+  /* Remove shadows and borders */
+  .card {
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+
+  /* Page break control */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .no-break {
+    page-break-inside: avoid;
+  }
+}
+
+/* ========================================================================
+   REDUCED MOTION PREFERENCE
+   
+   Respect user's system preference for reduced motion.
+   Some users have vestibular disorders that make animations uncomfortable.
+   We should always provide an alternative experience.
+   ======================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================================================
+   HIGH CONTRAST MODE
+   
+   Windows High Contrast Mode and similar accessibility features.
+   Ensure elements remain visible when forced colors are active.
+   ======================================================================== */
+@media (forced-colors: active) {
+  .btn {
+    border: 1px solid ButtonText;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    border: 1px solid ButtonText;
+  }
+
+  .card {
+    border: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servicios - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /*
+      Bill Payments / Services Page:
+      Grid of service providers with icons for quick recognition.
+      After selection, a payment form appears.
+    */
+    .page-title { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800);margin-bottom:var(--spacing-6); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-8);
+    }
+
+    .service-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-3);
+      padding: var(--spacing-5) var(--spacing-3);
+      background: var(--color-gray-0);
+      border: 2px solid var(--color-gray-200);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+
+    .service-card:hover { border-color:var(--color-primary-300);transform:translateY(-2px);box-shadow:var(--shadow-md); }
+    .service-card.selected { border-color:var(--color-primary-500);background:var(--color-primary-50); }
+
+    .service-icon {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+
+    .service-name { font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-700); }
+
+    /* Payment form panel */
+    .payment-panel {
+      display: none;
+      background: var(--color-gray-0);
+      border: 1px solid var(--color-gray-200);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-6);
+      margin-bottom: var(--spacing-8);
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .payment-panel.active { display: block; }
+
+    .payment-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-6);
+      padding-bottom: var(--spacing-4);
+      border-bottom: 1px solid var(--color-gray-100);
+    }
+
+    .payment-provider-icon { width:48px;height:48px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:24px; }
+    .payment-provider-name { font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800); }
+
+    .form-field { margin-bottom:var(--spacing-5); }
+    .form-field label { display:block;margin-bottom:var(--spacing-2);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-700); }
+    .form-field input, .form-field select { width:100%;height:40px;padding:0 var(--spacing-3);border:1px solid var(--color-gray-300);border-radius:var(--radius-md);font-size:var(--font-size-base);transition:border-color var(--transition-fast),box-shadow var(--transition-fast); }
+    .form-field input:focus, .form-field select:focus { outline:none;border-color:var(--color-primary-500);box-shadow:0 0 0 3px var(--color-primary-100); }
+    .form-field .field-error { font-size:var(--font-size-sm);color:var(--color-danger-600);margin-top:var(--spacing-1);display:none; }
+    .form-field.error input { border-color:var(--color-danger-500); }
+    .form-field.error .field-error { display:block; }
+
+    /* Payment history */
+    .history-title { font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);margin-bottom:var(--spacing-4); }
+
+    .history-list { display:flex;flex-direction:column;gap:var(--spacing-3); }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-4);
+      padding: var(--spacing-4);
+      background: var(--color-gray-0);
+      border: 1px solid var(--color-gray-200);
+      border-radius: var(--radius-lg);
+    }
+
+    .history-icon { width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px; }
+    .history-info { flex:1;min-width:0; }
+    .history-name { font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-800); }
+    .history-date { font-size:var(--font-size-xs);color:var(--color-gray-400); }
+    .history-amount { font-size:var(--font-size-sm);font-weight:var(--font-weight-bold);color:var(--color-gray-800); }
+
+    .btn-primary { background:var(--color-primary-600);color:white;border:none;height:44px;padding:0 var(--spacing-6);border-radius:var(--radius-md);font-weight:var(--font-weight-semibold);cursor:pointer;transition:background var(--transition-fast);font-size:var(--font-size-base); }
+    .btn-primary:hover { background:var(--color-primary-700); }
+    .btn-ghost { background:transparent;color:var(--color-gray-600);border:1px solid var(--color-gray-300);height:44px;padding:0 var(--spacing-6);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;transition:background var(--transition-fast); }
+    .btn-ghost:hover { background:var(--color-gray-50); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link active" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Pagar Servicios</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <h1 class="page-title">Pagar Servicios</h1>
+
+      <!-- Service providers grid -->
+      <div class="services-grid" id="servicesGrid">
+        <div class="service-card" onclick="selectService(this,'cfe','⚡','CFE','CFE Electricidad')" tabindex="0">
+          <div class="service-icon" style="background:#fef3c7;">⚡</div>
+          <div class="service-name">CFE</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'telcel','📱','Telcel','Telcel')" tabindex="0">
+          <div class="service-icon" style="background:#dbeafe;">📱</div>
+          <div class="service-name">Telcel</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'telmex','📞','Telmex','Telmex')" tabindex="0">
+          <div class="service-icon" style="background:#dcfce7;">📞</div>
+          <div class="service-name">Telmex</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'sky','📺','Sky','Sky Television')" tabindex="0">
+          <div class="service-icon" style="background:#e0f2fe;">📺</div>
+          <div class="service-name">Sky</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'agua','💧','Agua','Servicio de Agua')" tabindex="0">
+          <div class="service-icon" style="background:#ccfbf1;">💧</div>
+          <div class="service-name">Agua</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'gas','🔥','Gas','Gas Natural')" tabindex="0">
+          <div class="service-icon" style="background:#fee2e2;">🔥</div>
+          <div class="service-name">Gas</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'internet','🌐','Internet','Internet Fibra')" tabindex="0">
+          <div class="service-icon" style="background:#f3e8ff;">🌐</div>
+          <div class="service-name">Internet</div>
+        </div>
+        <div class="service-card" onclick="selectService(this,'impuestos','🏛️','Impuestos','SAT - Impuestos')" tabindex="0">
+          <div class="service-icon" style="background:#fef2f2;">🏛️</div>
+          <div class="service-name">Impuestos</div>
+        </div>
+      </div>
+
+      <!-- Payment form panel -->
+      <div class="payment-panel" id="paymentPanel">
+        <div class="payment-header">
+          <div class="payment-provider-icon" id="providerIcon" style="background:#fef3c7;">⚡</div>
+          <div>
+            <div class="payment-provider-name" id="providerName">CFE</div>
+            <div style="font-size:var(--font-size-sm);color:var(--color-gray-500);" id="providerDesc">CFE Electricidad</div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="serviceNumber">Número de servicio / Cliente</label>
+          <input type="text" id="serviceNumber" placeholder="Ej: 123456789" required>
+          <div class="field-error">Ingresa un número de servicio válido</div>
+        </div>
+
+        <div class="form-field">
+          <label for="serviceAmount">Monto a pagar</label>
+          <input type="number" id="serviceAmount" placeholder="$0.00" min="1" step="0.01" required>
+          <div class="field-error">Ingresa un monto válido</div>
+        </div>
+
+        <div class="form-field">
+          <label for="payFrom">Pagar desde</label>
+          <select id="payFrom">
+            <option value="checking">Cuenta Corriente •••• 4523 ($45,280.50)</option>
+            <option value="savings">Ahorro •••• 7891 ($128,450.00)</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:var(--spacing-3);margin-top:var(--spacing-6);">
+          <button class="btn-ghost" onclick="closePaymentPanel()">Cancelar</button>
+          <button class="btn-primary" style="flex:1;" onclick="processPayment()">Pagar</button>
+        </div>
+      </div>
+
+      <!-- Payment history -->
+      <div class="history-title">Historial de pagos</div>
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-icon" style="background:#fef3c7;">⚡</div>
+          <div class="history-info">
+            <div class="history-name">CFE - Electricidad</div>
+            <div class="history-date">19 Jun 2024</div>
+          </div>
+          <div class="history-amount">-$850.00</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#dbeafe;">📱</div>
+          <div class="history-info">
+            <div class="history-name">Telcel - Recarga</div>
+            <div class="history-date">15 Jun 2024</div>
+          </div>
+          <div class="history-amount">-$200.00</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#dcfce7;">📞</div>
+          <div class="history-info">
+            <div class="history-name">Telmex - Internet</div>
+            <div class="history-date">10 Jun 2024</div>
+          </div>
+          <div class="history-amount">-$650.00</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    let selectedServiceProvider = null;
+
+    function selectService(el, id, icon, name, desc) {
+      document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedServiceProvider = id;
+
+      document.getElementById('providerIcon').textContent = icon;
+      document.getElementById('providerName').textContent = name;
+      document.getElementById('providerDesc').textContent = desc;
+      document.getElementById('paymentPanel').classList.add('active');
+      document.getElementById('paymentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closePaymentPanel() {
+      document.getElementById('paymentPanel').classList.remove('active');
+      document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    }
+
+    async function processPayment() {
+      const num = document.getElementById('serviceNumber').value;
+      const amount = parseFloat(document.getElementById('serviceAmount').value);
+
+      let valid = true;
+      if (!num.trim()) { document.getElementById('serviceNumber').parentElement.classList.add('error'); valid = false; }
+      else { document.getElementById('serviceNumber').parentElement.classList.remove('error'); }
+
+      if (!amount || amount <= 0) { document.getElementById('serviceAmount').parentElement.classList.add('error'); valid = false; }
+      else { document.getElementById('serviceAmount').parentElement.classList.remove('error'); }
+
+      if (!valid) return;
+
+      showToast('Procesando', 'Confirmando pago...', 'info');
+      await new Promise(r => setTimeout(r, 2000));
+      showToast('Éxito', `Pago de $${amount.toFixed(2)} procesado exitosamente`, 'success');
+      closePaymentPanel();
+      document.getElementById('serviceNumber').value = '';
+      document.getElementById('serviceAmount').value = '';
+    }
+
+    function showToast(title, message, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+  </script>
+</body>
+</html>

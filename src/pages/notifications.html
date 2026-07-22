@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificaciones - SmartBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/reset.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/layout.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <link rel="stylesheet" href="../styles/utilities.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/dark-theme.css">
+  <style>
+    /*
+      Notifications Center:
+      WHY notification pattern?
+      - Keeps users informed without interrupting their flow
+      - Allows batch processing (read multiple at once)
+      - Unread count creates urgency
+    */
+    .page-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--spacing-6);flex-wrap:wrap;gap:var(--spacing-4); }
+    .page-title { font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);color:var(--color-gray-800); }
+
+    .filter-tabs { display:flex;gap:var(--spacing-2);margin-bottom:var(--spacing-6);border-bottom:2px solid var(--color-gray-200);overflow-x:auto; }
+    .filter-tab { padding:var(--spacing-3) var(--spacing-4);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all var(--transition-fast);white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none; }
+    .filter-tab:hover { color:var(--color-gray-700); }
+    .filter-tab.active { color:var(--color-primary-600);border-bottom-color:var(--color-primary-600); }
+
+    .notif-list { display:flex;flex-direction:column;gap:var(--spacing-2); }
+
+    .notif-item {
+      display:flex;align-items:flex-start;gap:var(--spacing-4);
+      padding:var(--spacing-4) var(--spacing-5);
+      background:var(--color-gray-0);border:1px solid var(--color-gray-200);
+      border-radius:var(--radius-lg);transition:all var(--transition-fast);cursor:pointer;
+    }
+    .notif-item:hover { border-color:var(--color-primary-200);background:var(--color-primary-50); }
+    .notif-item.unread { border-left:3px solid var(--color-primary-500);background:var(--color-primary-50); }
+    .notif-item.read { opacity:0.7; }
+
+    .notif-icon { width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:var(--font-size-lg); }
+    .notif-icon.success { background:var(--color-success-50);color:var(--color-success-600); }
+    .notif-icon.info { background:var(--color-info-50);color:var(--color-info-600); }
+    .notif-icon.warning { background:var(--color-warning-50);color:var(--color-warning-600); }
+    .notif-icon.danger { background:var(--color-danger-50);color:var(--color-danger-600); }
+
+    .notif-content { flex:1;min-width:0; }
+    .notif-title { font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);margin-bottom:var(--spacing-1); }
+    .notif-text { font-size:var(--font-size-sm);color:var(--color-gray-500);line-height:var(--line-height-normal); }
+    .notif-time { font-size:var(--font-size-xs);color:var(--color-gray-400);margin-top:var(--spacing-1); }
+
+    .notif-actions { display:flex;gap:var(--spacing-2);flex-shrink:0; }
+    .notif-btn { padding:var(--spacing-1) var(--spacing-2);border-radius:var(--radius-sm);font-size:var(--font-size-xs);border:1px solid var(--color-gray-200);background:var(--color-gray-0);color:var(--color-gray-500);cursor:pointer;transition:all var(--transition-fast); }
+    .notif-btn:hover { background:var(--color-gray-100);color:var(--color-gray-700); }
+
+    .btn-primary { background:var(--color-primary-600);color:white;border:none;height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm); }
+    .btn-ghost { background:transparent;color:var(--color-gray-600);border:1px solid var(--color-gray-300);height:40px;padding:0 var(--spacing-4);border-radius:var(--radius-md);font-weight:var(--font-weight-medium);cursor:pointer;font-size:var(--font-size-sm); }
+    .btn-ghost:hover { background:var(--color-gray-50); }
+
+    .empty-state { text-align:center;padding:var(--spacing-12);color:var(--color-gray-400); }
+    .empty-state p { margin-top:var(--spacing-3);font-size:var(--font-size-sm); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="app-sidebar" id="sidebar" aria-label="Menú">
+      <div style="padding:var(--spacing-6);">
+        <div style="display:flex;align-items:center;gap:var(--spacing-3);margin-bottom:var(--spacing-8);">
+          <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="16" fill="#3b82f6"/><path d="M20 55V30L40 20L60 30V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 55V40H50V55" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="33" r="4" stroke="white" stroke-width="2"/></svg>
+          <span style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold);color:white;">SmartBank</span>
+        </div>
+        <nav><ul style="display:flex;flex-direction:column;gap:var(--spacing-1);">
+          <li><a href="dashboard.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+          <li><a href="accounts.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cuentas</a></li>
+          <li><a href="cards.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tarjetas</a></li>
+          <li><a href="transfers.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Transferencias</a></li>
+          <li><a href="services.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Servicios</a></li>
+          <li><a href="beneficiaries.html" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Beneficiarios</a></li>
+        </ul></nav>
+      </div>
+      <style>.sidebar-link{display:flex;align-items:center;gap:var(--spacing-3);padding:var(--spacing-3) var(--spacing-4);border-radius:var(--radius-md);color:rgba(255,255,255,0.6);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);text-decoration:none;transition:all var(--transition-fast);}.sidebar-link:hover{background:rgba(255,255,255,0.1);color:white;}.sidebar-link.active{background:var(--color-primary-600);color:white;}</style>
+    </aside>
+
+    <header class="app-header">
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <button class="hide-desktop" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Menú"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h2 style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold);color:var(--color-gray-800);">Notificaciones</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--spacing-4);">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-100);color:var(--color-primary-600);display:flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);">JP</div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="page-header">
+        <h1 class="page-title">Centro de notificaciones</h1>
+        <div style="display:flex;gap:var(--spacing-2);">
+          <button class="btn-ghost" onclick="markAllRead()">Marcar todo leído</button>
+          <button class="btn-ghost" onclick="clearAll()" style="color:var(--color-danger-600);border-color:var(--color-danger-200);">Limpiar todo</button>
+        </div>
+      </div>
+
+      <div class="filter-tabs" role="tablist">
+        <button class="filter-tab active" role="tab" onclick="filterNotifs('all',this)">Todas</button>
+        <button class="filter-tab" role="tab" onclick="filterNotifs('unread',this)">No leídas</button>
+        <button class="filter-tab" role="tab" onclick="filterNotifs('transfer',this)">Transferencias</button>
+        <button class="filter-tab" role="tab" onclick="filterNotifs('payment',this)">Pagos</button>
+        <button class="filter-tab" role="tab" onclick="filterNotifs('security',this)">Seguridad</button>
+      </div>
+
+      <div class="notif-list" id="notifList"></div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    let notifications = [
+      { id:1, type:'transfer', icon:'success', title:'Transferencia completada', text:'Tu transferencia de $2,500 a María López se completó exitosamente.', time:'Hace 2 horas', read:false },
+      { id:2, type:'transfer', icon:'success', title:'Depósito recibido', text:'Se depositaron $15,000.00 en tu cuenta corriente.', time:'Ayer', read:false },
+      { id:3, type:'payment', icon:'info', title:'Pago de CFE procesado', text:'Tu pago de electricidad por $850.00 fue procesado.', time:'Hace 3 días', read:true },
+      { id:4, type:'security', icon:'warning', title:'Nuevo dispositivo detectado', text:'Se detectó un login desde Chrome en Windows en Ciudad de México.', time:'Hace 5 días', read:true },
+      { id:5, type:'transfer', icon:'info', title:'Transferencia programada', text:'Tu transferencia programada de $5,000 se ejecutará mañana.', time:'Hace 1 semana', read:true },
+      { id:6, type:'payment', icon:'danger', title:'Pago rechazado', text:'El pago a Telcel por $200 fue rechazado. Verifica tu saldo.', time:'Hace 2 semanas', read:true },
+    ];
+
+    let currentFilter = 'all';
+
+    function renderNotifs() {
+      let filtered = notifications;
+      if (currentFilter === 'unread') filtered = notifications.filter(n => !n.read);
+      else if (currentFilter !== 'all') filtered = notifications.filter(n => n.type === currentFilter);
+
+      const list = document.getElementById('notifList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty-state"><p>No hay notificaciones</p></div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(n => `
+        <div class="notif-item ${n.read ? 'read' : 'unread'}" onclick="markRead(${n.id})">
+          <div class="notif-icon ${n.icon}">${n.type==='transfer'?'💸':n.type==='payment'?'📋':'🔒'}</div>
+          <div class="notif-content">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-text">${n.text}</div>
+            <div class="notif-time">${n.time}</div>
+          </div>
+          <div class="notif-actions" onclick="event.stopPropagation()">
+            <button class="notif-btn" onclick="toggleRead(${n.id})">${n.read?'No leído':'Leído'}</button>
+            <button class="notif-btn" onclick="deleteNotif(${n.id})" style="color:var(--color-danger-500);">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterNotifs(filter, tab) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderNotifs();
+    }
+
+    function markRead(id) {
+      const n = notifications.find(x => x.id === id);
+      if (n) n.read = true;
+      renderNotifs();
+    }
+
+    function toggleRead(id) {
+      const n = notifications.find(x => x.id === id);
+      if (n) n.read = !n.read;
+      renderNotifs();
+    }
+
+    function deleteNotif(id) {
+      notifications = notifications.filter(n => n.id !== id);
+      renderNotifs();
+    }
+
+    function markAllRead() {
+      notifications.forEach(n => n.read = true);
+      renderNotifs();
+      showToast('Hecho', 'Todas las notificaciones marcadas como leídas', 'success');
+    }
+
+    function clearAll() {
+      notifications = [];
+      renderNotifs();
+      showToast('Limpiado', 'Todas las notificaciones eliminadas', 'success');
+    }
+
+    function showToast(title, message, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+
+    renderNotifs();
+  </script>
+</body>
+</html>

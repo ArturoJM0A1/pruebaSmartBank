@@ -1,0 +1,213 @@
+/* ==========================================================================
+   SmartBank CSS Reset
+   
+   WHY a reset?
+   Every browser has its own default styles for HTML elements.
+   These defaults differ between browsers, causing inconsistencies.
+   A reset normalizes these differences so we start from a clean slate.
+   
+   WHY not use normalize.css?
+   normalize.css preserves useful defaults and fixes bugs.
+   Our reset is more aggressive - we want complete control over styling.
+   For most projects, normalize.css is actually better.
+   
+   Our approach: Modern reset that's more targeted than the old
+   Eric Meyer reset, using box-sizing: border-box everywhere
+   and removing all default margins/paddings.
+   
+   Key principles:
+   1. box-sizing: border-box on everything (width includes padding+border)
+   2. Remove default margins/paddings
+   3. Set sensible defaults for typography
+   4. Make images responsive by default
+   5. Reset form elements to be consistent
+   ========================================================================== */
+
+/* 
+   box-sizing: border-box means width/height include padding and border.
+   WITHOUT border-box: width=200 + padding=20 = 240px total
+   WITH border-box: width=200 total, padding is subtracted from content
+   
+   WHY border-box? It's how most people intuitively expect sizing to work.
+*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+   Remove default margins on all elements.
+   Margins cause unpredictable spacing between elements.
+   We control spacing explicitly through our design system.
+*/
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/*
+   Set root html element defaults.
+   - font-size: 16px is the browser default, but setting it explicitly
+     ensures rem units are predictable (1rem = 16px)
+   - text-rendering: optimizeLegibility enables better kerning
+   - -webkit-font-smoothing: antialiased gives cleaner fonts on macOS
+*/
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+/*
+   Body defaults:
+   - min-height: 100vh ensures body fills viewport
+   - font-family set from our design tokens
+   - line-height 1.5 is recommended for readability (WCAG)
+   - color set from tokens for consistent text
+   - background set for light theme base
+*/
+body {
+  min-height: 100vh;
+  line-height: var(--line-height-normal, 1.5);
+  font-family: var(--font-family-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  color: var(--color-gray-800, #1e293b);
+  background-color: var(--color-gray-50, #f8fafc);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+   Typography improvements.
+   - text-wrap: balance prevents orphans in headings (CSS Text Level 4)
+   - Improved heading spacing and line-height for readability
+*/
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+/*
+   Paragraphs and body text.
+   text-wrap: pretty is a newer CSS value that improves paragraph
+   rendering by balancing line lengths (not just headings).
+*/
+p {
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+/*
+   Links.
+   No underline by default for cleaner UI. Underline on hover for affordance.
+   Color inherits from parent, styled in typography.css for specific contexts.
+*/
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/*
+   Lists.
+   Remove bullets/numbers by default. List styles applied in components.
+*/
+ul, ol {
+  list-style: none;
+}
+
+/*
+   Images.
+   display: block removes inline image gaps.
+   max-width: 100% prevents images from overflowing their containers.
+   height: auto maintains aspect ratio.
+*/
+img, svg, video, canvas, audio, iframe, embed, object {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+/*
+   Form elements inherit font styles.
+   Without this, inputs use browser defaults which may differ from body font.
+   This ensures form elements match the rest of the typography.
+*/
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+/*
+   Button reset.
+   - background: none removes default button background
+   - border: none removes default button border
+   - cursor: pointer indicates interactivity
+*/
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/*
+   Textarea reset.
+   - resize: vertical prevents horizontal resizing which can break layouts
+*/
+textarea {
+  resize: vertical;
+}
+
+/*
+   Table reset.
+   - border-collapse: collapses borders into single lines
+   - border-spacing: 0 removes gaps between cells
+*/
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/*
+   Accessibility.
+   - sr-only class hides content visually but keeps it accessible
+     to screen readers. Essential for skip links and icon labels.
+   
+   - focus-visible shows outline only for keyboard navigation,
+     not mouse clicks. This is important for accessibility.
+*/
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/*
+   Focus visible styles.
+   :focus-visible is a newer pseudo-class that only shows focus
+   indicators when the user is navigating via keyboard (Tab key).
+   This is better than :focus which also shows on mouse clicks.
+*/
+:focus-visible {
+  outline: 2px solid var(--color-primary-500, #3b82f6);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 0.25rem);
+}
+
+/*
+   Remove default outlines for mouse users.
+   Only keyboard users should see focus indicators.
+*/
+:focus:not(:focus-visible) {
+  outline: none;
+}
